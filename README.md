@@ -1,6 +1,6 @@
 ## dot - DSL in Go for the graphviz dot language
 
-![DOT language](http://www.graphviz.org/doc/info/lang.html)
+[DOT language](http://www.graphviz.org/doc/info/lang.html)
 
 	package main
 	
