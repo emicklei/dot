@@ -1,4 +1,4 @@
-## dot - DSL in Go for the graphviz dot language
+## dot - little helper package in Go for the graphviz dot language
 
 [DOT language](http://www.graphviz.org/doc/info/lang.html)
 
@@ -27,10 +27,10 @@
 Output
 
 	digraph {
-		node [label="coding",]; n1;
-		node [label="testing a little",shape="box",]; n2;
-		n1 -> n2 [];
-		n2 -> n1 [color="red",];
+		node [label="coding"]; n1;
+		node [label="testing a little",shape="box"]; n2;
+		n1 -> n2;
+		n2 -> n1 [color="red"];
 	}
 
 (c) 2015, http://ernestmicklei.com. MIT License
