@@ -14,10 +14,10 @@
 	func main() {
 		g := dot.NewDigraph()
 		n1 := g.Node("coding")
-		n2 := g.Node("testing a little").Attr("shape", "box")
+		n2 := g.Node("testing a little").Box()
 	
 		g.Edge(n1, n2)
-		e := g.Edge(n2, n1).Attr("color", "red")
+		e := g.Edge(n2, n1, "back").Attr("color", "red")
 	
 		fmt.Println(g.String())
 	}
@@ -28,7 +28,7 @@ Output
 		node [label="coding"]; n1;
 		node [label="testing a little",shape="box"]; n2;
 		n1 -> n2;
-		n2 -> n1 [color="red"];
+		n2 -> n1 [color="red", label="back"];
 	}
 
 (c) 2015, http://ernestmicklei.com. MIT License

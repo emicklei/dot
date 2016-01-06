@@ -3,6 +3,7 @@ package dot
 import (
 	"bytes"
 	"fmt"
+	"strings"
 )
 
 // AttributesMap holds attribute=value pairs.
@@ -18,54 +19,87 @@ func (a AttributesMap) Attr(label string, value interface{}) {
 	a.attributes[label] = value
 }
 
-type node struct {
+type Node struct {
 	AttributesMap
-	id  string
-	seq int
+	graph *Digraph
+	id    string
+	seq   int
 }
 
-func (n node) Attr(label string, value interface{}) node {
+// Attr sets label=value and return the Node
+func (n Node) Attr(label string, value interface{}) Node {
 	n.AttributesMap.Attr(label, value)
 	return n
 }
 
-type edge struct {
-	AttributesMap
-	from, to node
+// Box sets the attribute "shape" to "box"
+func (n Node) Box() Node {
+	return n.Attr("shape", "box")
 }
 
-func (e edge) Attr(label string, value interface{}) edge {
+// Edge sets label=value and return the Edge
+func (n Node) Edge(o Node, labels ...string) Edge {
+	return n.graph.Edge(n, o, labels...)
+}
+
+// Edge represents a graph edge between two Nodes.
+type Edge struct {
+	AttributesMap
+	graph    *Digraph
+	from, to Node
+}
+
+// Attr sets label=value and return the Egde
+func (e Edge) Attr(label string, value interface{}) Edge {
 	e.AttributesMap.Attr(label, value)
 	return e
 }
 
 type Digraph struct {
 	seq       int
-	nodes     map[string]node
-	edgesFrom map[string][]edge
+	nodes     map[string]Node
+	edgesFrom map[string][]Edge
 }
 
 func NewDigraph() *Digraph {
 	return &Digraph{
-		nodes:     map[string]node{},
-		edgesFrom: map[string][]edge{},
+		nodes:     map[string]Node{},
+		edgesFrom: map[string][]Edge{},
 	}
 }
 
-// Node creates a new with label set to id
-func (g *Digraph) Node(id string) node {
+// Node returns the node created with this id or creates a new node if absent.
+// This method can be used as both a constructor and accessor.
+func (g *Digraph) Node(id string) Node {
+	n, ok := g.nodes[id]
+	if ok {
+		return n
+	}
+	// create a new
 	g.seq++
-	return node{id: id, seq: g.seq, AttributesMap: AttributesMap{attributes: map[string]interface{}{
-		"label": id,
-	}}}
+	n = Node{
+		id:  id,
+		seq: g.seq,
+		AttributesMap: AttributesMap{attributes: map[string]interface{}{
+			"label": id}},
+		graph: g,
+	}
+	g.nodes[id] = n
+	return n
 }
 
-// Node creates a new with from set to n1 and to set to n2
-func (g Digraph) Edge(n1, n2 node) edge {
-	e := edge{from: n1, to: n2, AttributesMap: AttributesMap{attributes: map[string]interface{}{}}}
-	g.nodes[n1.id] = n1
-	g.nodes[n2.id] = n2
+// Edge creates a new edge from n1 to n2. Nodes can be have multiple edges to the same other node (or itself).
+// If one or more labels are given then the "label" attribute is set to the concatenation.
+func (g *Digraph) Edge(n1, n2 Node, labels ...string) Edge {
+	e := Edge{
+		from:          n1,
+		to:            n2,
+		AttributesMap: AttributesMap{attributes: map[string]interface{}{}},
+		graph:         g}
 	g.edgesFrom[n1.id] = append(g.edgesFrom[n1.id], e)
+	if len(labels) > 0 {
+		e.Attr("label", strings.Join(labels, ","))
+	}
 	return e
 }
 
