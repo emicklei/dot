@@ -24,21 +24,31 @@ type node struct {
 	seq int
 }
 
+func (n node) Attr(label string, value interface{}) node {
+	n.AttributesMap.Attr(label, value)
+	return n
+}
+
 type edge struct {
 	AttributesMap
 	from, to node
 }
 
+func (e edge) Attr(label string, value interface{}) edge {
+	e.AttributesMap.Attr(label, value)
+	return e
+}
+
 type Digraph struct {
 	seq       int
 	nodes     map[string]node
-	edgesFrom map[string]edge
+	edgesFrom map[string][]edge
 }
 
 func NewDigraph() *Digraph {
 	return &Digraph{
 		nodes:     map[string]node{},
-		edgesFrom: map[string]edge{},
+		edgesFrom: map[string][]edge{},
 	}
 }
 
@@ -55,7 +65,7 @@ func (g Digraph) Edge(n1, n2 node) edge {
 	e := edge{from: n1, to: n2, AttributesMap: AttributesMap{attributes: map[string]interface{}{}}}
 	g.nodes[n1.id] = n1
 	g.nodes[n2.id] = n2
-	g.edgesFrom[n1.id] = e
+	g.edgesFrom[n1.id] = append(g.edgesFrom[n1.id], e)
 	return e
 }
 
@@ -79,22 +89,23 @@ func (g Digraph) String() string {
 		}
 		fmt.Fprintf(b, "; n%d;\n", each.seq)
 	}
-	for _, each := range g.edgesFrom {
-		fmt.Fprintf(b, "\tn%d -> n%d", each.from.seq, each.to.seq)
-		if len(each.attributes) > 0 {
-			b.WriteString(" [")
-			first := true
-			for label, value := range each.attributes {
-				if !first {
-					fmt.Fprintf(b, ", ")
+	for _, all := range g.edgesFrom {
+		for _, each := range all {
+			fmt.Fprintf(b, "\tn%d -> n%d", each.from.seq, each.to.seq)
+			if len(each.attributes) > 0 {
+				b.WriteString(" [")
+				first := true
+				for label, value := range each.attributes {
+					if !first {
+						fmt.Fprintf(b, ", ")
+					}
+					fmt.Fprintf(b, "%s=%q", label, value)
+					first = false
 				}
-				fmt.Fprintf(b, "%s=%q", label, value)
-				first = false
+				b.WriteString("]")
 			}
-			b.WriteString("]")
+			b.WriteString(";\n")
 		}
-		b.WriteString(";\n")
-
 	}
 	b.WriteString("}")
 	return b.String()

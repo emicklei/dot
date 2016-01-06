@@ -14,12 +14,10 @@
 	func main() {
 		g := dot.NewDigraph()
 		n1 := g.Node("coding")
-		n2 := g.Node("testing a little")
-		n2.Attr("shape", "box")
+		n2 := g.Node("testing a little").Attr("shape", "box")
 	
 		g.Edge(n1, n2)
-		e := g.Edge(n2, n1)
-		e.Attr("color", "red")
+		e := g.Edge(n2, n1).Attr("color", "red")
 	
 		fmt.Println(g.String())
 	}
