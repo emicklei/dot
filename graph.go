@@ -6,71 +6,58 @@ import (
 	"strings"
 )
 
-// AttributesMap holds attribute=value pairs.
-type AttributesMap struct {
-	attributes map[string]interface{}
-}
+const (
+	Strict     = "strict"
+	Undirected = "graph"
+	Directed   = "digraph"
+	Sub        = "subgraph"
+)
 
-// Attr sets the value for an attribute (unless empty).
-func (a AttributesMap) Attr(label string, value interface{}) {
-	if len(label) == 0 {
-		return
-	}
-	a.attributes[label] = value
-}
-
-type Node struct {
+type Graph struct {
 	AttributesMap
-	graph *Digraph
-	id    string
-	seq   int
-}
-
-// Attr sets label=value and return the Node
-func (n Node) Attr(label string, value interface{}) Node {
-	n.AttributesMap.Attr(label, value)
-	return n
-}
-
-// Box sets the attribute "shape" to "box"
-func (n Node) Box() Node {
-	return n.Attr("shape", "box")
-}
-
-// Edge sets label=value and return the Edge
-func (n Node) Edge(o Node, labels ...string) Edge {
-	return n.graph.Edge(n, o, labels...)
-}
-
-// Edge represents a graph edge between two Nodes.
-type Edge struct {
-	AttributesMap
-	graph    *Digraph
-	from, to Node
-}
-
-// Attr sets label=value and return the Egde
-func (e Edge) Attr(label string, value interface{}) Edge {
-	e.AttributesMap.Attr(label, value)
-	return e
-}
-
-type Digraph struct {
+	id        string
+	graphType string
 	seq       int
 	nodes     map[string]Node
 	edgesFrom map[string][]Edge
+	subgraphs map[string]*Graph
 }
 
-func NewDigraph() *Digraph {
-	return &Digraph{
-		nodes:     map[string]Node{},
-		edgesFrom: map[string][]Edge{},
+func NewDigraph() *Graph {
+	return NewGraph(Directed)
+}
+
+func NewGraph(graphType string) *Graph {
+	return &Graph{
+		AttributesMap: AttributesMap{attributes: map[string]interface{}{}},
+		graphType:     graphType,
+		nodes:         map[string]Node{},
+		edgesFrom:     map[string][]Edge{},
+		subgraphs:     map[string]*Graph{},
 	}
+}
+
+func (g *Graph) ID(newID string) *Graph {
+	g.id = newID
+	return g
+}
+
+// Subgraph returns the Graph with the given label ; creates one if absent.
+func (g *Graph) Subgraph(label string) *Graph {
+	sub, ok := g.subgraphs[label]
+	if ok {
+		return sub
+	}
+	sub = NewGraph(Sub)
+	sub.Attr("label", label)
+	sub.ID(fmt.Sprintf("s%d", len(g.subgraphs)))
+	g.subgraphs[label] = sub
+	return sub
 }
 
 // Node returns the node created with this id or creates a new node if absent.
 // This method can be used as both a constructor and accessor.
-func (g *Digraph) Node(id string) Node {
+func (g *Graph) Node(id string) Node {
 	n, ok := g.nodes[id]
 	if ok {
 		return n
@@ -90,7 +77,7 @@ func (g *Digraph) Node(id string) Node {
 
 // Edge creates a new edge from n1 to n2. Nodes can be have multiple edges to the same other node (or itself).
 // If one or more labels are given then the "label" attribute is set to the concatenation.
-func (g *Digraph) Edge(n1, n2 Node, labels ...string) Edge {
+func (g *Graph) Edge(n1, n2 Node, labels ...string) Edge {
 	e := Edge{
 		from:          n1,
 		to:            n2,
@@ -104,9 +91,21 @@ func (g *Digraph) Edge(n1, n2 Node, labels ...string) Edge {
 }
 
 // String returns the source in dot notation.
-func (g Digraph) String() string {
+func (g Graph) String() string {
 	b := new(bytes.Buffer)
-	b.WriteString("digraph {\n")
+	fmt.Fprintf(b, "%s {\n", g.graphType)
+	if len(g.id) > 0 {
+		fmt.Fprintf(b, "\tID=%q;\n", g.id)
+	}
+	// subgraphs
+	for _, each := range g.subgraphs {
+		b.WriteString(each.String())
+	}
+	// graph attributes
+	for label, value := range g.AttributesMap.attributes {
+		fmt.Fprintf(b, "\t%s=%q;\n", label, value)
+	}
+	// graph nodes
 	for _, each := range g.nodes {
 		fmt.Fprintf(b, "\tnode")
 		if len(each.attributes) > 0 {
@@ -123,6 +122,7 @@ func (g Digraph) String() string {
 		}
 		fmt.Fprintf(b, "; n%d;\n", each.seq)
 	}
+	// graph edges
 	for _, all := range g.edgesFrom {
 		for _, each := range all {
 			fmt.Fprintf(b, "\tn%d -> n%d", each.from.seq, each.to.seq)
@@ -141,6 +141,6 @@ func (g Digraph) String() string {
 			b.WriteString(";\n")
 		}
 	}
-	b.WriteString("}")
+	b.WriteString("}\n")
 	return b.String()
 }

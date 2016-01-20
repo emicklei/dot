@@ -31,4 +31,16 @@ Output
 		n2 -> n1 [color="red", label="back"];
 	}
 
+Chaining edges
+
+	g.Node("A").Edge(g.Node("B")).Edge(g.Node("C"))
+	
+	A -> B -> C
+
+Subgraphs
+
+	s := g.Subgraph("cluster")
+	s.Attr("style","filled")
+
+
 (c) 2015, http://ernestmicklei.com. MIT License
