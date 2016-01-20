@@ -12,3 +12,8 @@ func (a AttributesMap) Attr(label string, value interface{}) {
 	}
 	a.attributes[label] = value
 }
+
+// Value return the value added for this label.
+func (a AttributesMap) Value(label string) interface{} {
+	return a.attributes[label]
+}
