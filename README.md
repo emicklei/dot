@@ -17,7 +17,7 @@
 		n2 := g.Node("testing a little").Box()
 	
 		g.Edge(n1, n2)
-		e := g.Edge(n2, n1, "back").Attr("color", "red")
+		g.Edge(n2, n1, "back").Attr("color", "red")
 	
 		fmt.Println(g.String())
 	}
