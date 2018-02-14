@@ -75,15 +75,16 @@ func (g *Graph) Node(id string) Node {
 	return n
 }
 
-// Edge creates a new edge from n1 to n2. Nodes can be have multiple edges to the same other node (or itself).
-// If one or more labels are given then the "label" attribute is set to the concatenation.
-func (g *Graph) Edge(n1, n2 Node, labels ...string) Edge {
+// Edge creates a new edge between two nodes.
+// Nodes can be have multiple edges to the same other node (or itself).
+// If one or more labels are given then the "label" attribute is set to the edge.
+func (g *Graph) Edge(fromNode, toNode Node, labels ...string) Edge {
 	e := Edge{
-		from:          n1,
-		to:            n2,
+		from:          fromNode,
+		to:            toNode,
 		AttributesMap: AttributesMap{attributes: map[string]interface{}{}},
 		graph:         g}
-	g.edgesFrom[n1.id] = append(g.edgesFrom[n1.id], e)
+	g.edgesFrom[fromNode.id] = append(g.edgesFrom[fromNode.id], e)
 	if len(labels) > 0 {
 		e.Attr("label", strings.Join(labels, ","))
 	}

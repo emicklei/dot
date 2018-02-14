@@ -1,5 +1,6 @@
 package dot
 
+// Node represents a dot Node.
 type Node struct {
 	AttributesMap
 	graph *Graph
@@ -18,7 +19,7 @@ func (n Node) Box() Node {
 	return n.Attr("shape", "box")
 }
 
-// Edge sets label=value and return the Edge
-func (n Node) Edge(o Node, labels ...string) Edge {
-	return n.graph.Edge(n, o, labels...)
+// Edge sets label=value and returns the Edge for chaining.
+func (n Node) Edge(toNode Node, labels ...string) Edge {
+	return n.graph.Edge(n, toNode, labels...)
 }
