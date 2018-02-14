@@ -42,5 +42,8 @@ Subgraphs
 	s := g.Subgraph("cluster")
 	s.Attr("style","filled")
 
+## test your graph
+
+	go run main.go | dot -Tpng  > test.png && open test.png
 
 (c) 2015, http://ernestmicklei.com. MIT License

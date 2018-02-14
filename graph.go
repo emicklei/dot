@@ -3,6 +3,7 @@ package dot
 import (
 	"bytes"
 	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -94,54 +95,81 @@ func (g *Graph) Edge(fromNode, toNode Node, labels ...string) Edge {
 // String returns the source in dot notation.
 func (g Graph) String() string {
 	b := new(bytes.Buffer)
-	fmt.Fprintf(b, "%s {\n", g.graphType)
+	fmt.Fprintf(b, "%s{", g.graphType)
 	if len(g.id) > 0 {
-		fmt.Fprintf(b, "\tID=%q;\n", g.id)
+		fmt.Fprintf(b, "ID=%q;", g.id)
 	}
 	// subgraphs
 	for _, each := range g.subgraphs {
 		b.WriteString(each.String())
 	}
 	// graph attributes
-	for label, value := range g.AttributesMap.attributes {
-		fmt.Fprintf(b, "\t%s=%q;\n", label, value)
-	}
+	appendSortedMap(g.AttributesMap.attributes, false, b)
 	// graph nodes
 	for _, each := range g.nodes {
-		fmt.Fprintf(b, "\tnode")
-		if len(each.attributes) > 0 {
-			b.WriteString(" [")
-			first := true
-			for label, value := range each.attributes {
-				if !first {
-					fmt.Fprintf(b, ", ")
-				}
-				fmt.Fprintf(b, "%s=%q", label, value)
-				first = false
-			}
-			b.WriteString("]")
-		}
-		fmt.Fprintf(b, "; n%d;\n", each.seq)
+		fmt.Fprintf(b, "node")
+		appendSortedMap(each.attributes, true, b)
+		fmt.Fprintf(b, "n%d;", each.seq)
 	}
 	// graph edges
 	for _, all := range g.edgesFrom {
 		for _, each := range all {
-			fmt.Fprintf(b, "\tn%d -> n%d", each.from.seq, each.to.seq)
-			if len(each.attributes) > 0 {
-				b.WriteString(" [")
-				first := true
-				for label, value := range each.attributes {
-					if !first {
-						fmt.Fprintf(b, ", ")
-					}
-					fmt.Fprintf(b, "%s=%q", label, value)
-					first = false
-				}
-				b.WriteString("]")
-			}
-			b.WriteString(";\n")
+			fmt.Fprintf(b, "n%d->n%d", each.from.seq, each.to.seq)
+			appendSortedMap(each.attributes, true, b)
+			fmt.Fprint(b, ";")
 		}
 	}
-	b.WriteString("}\n")
+	b.WriteString("}")
 	return b.String()
+}
+
+func appendSortedMap(m map[string]interface{}, mustBracket bool, b *bytes.Buffer) {
+	if len(m) == 0 {
+		return
+	}
+	if mustBracket {
+		b.WriteString("[")
+	}
+	first := true
+	// first collect keys
+	keys := []string{}
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.StringSlice(keys).Sort()
+
+	for _, k := range keys {
+		if !first {
+			fmt.Fprintf(b, ",")
+		}
+		fmt.Fprintf(b, "%s=%q", k, m[k])
+		first = false
+	}
+	if mustBracket {
+		b.WriteString("]")
+	}
+}
+
+type IndentBuffer struct {
+	buffer *bytes.Buffer
+	level  int
+}
+
+func (i *IndentBuffer) Indent() *IndentBuffer {
+	i.level++
+	i.buffer.WriteString("\t")
+	return i
+}
+
+func (i *IndentBuffer) BackIndent() *IndentBuffer {
+	i.level--
+	return i
+}
+
+func (i *IndentBuffer) NewLine() *IndentBuffer {
+	i.buffer.WriteString("\n")
+	for j := 0; j < i.level; j++ {
+		i.buffer.WriteString("\t")
+	}
+	return i
 }
