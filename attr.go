@@ -7,8 +7,14 @@ type AttributesMap struct {
 
 // Attr sets the value for an attribute (unless empty).
 func (a AttributesMap) Attr(label string, value interface{}) {
-	if len(label) == 0 {
+	if len(label) == 0 || value == nil {
 		return
+	}
+	if s, ok := value.(string); ok {
+		if len(s) > 0 {
+			a.attributes[label] = s
+			return
+		}
 	}
 	a.attributes[label] = value
 }

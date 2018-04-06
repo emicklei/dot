@@ -3,6 +3,7 @@ package dot
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"sort"
 	"strings"
 )
@@ -95,13 +96,19 @@ func (g *Graph) Edge(fromNode, toNode Node, labels ...string) Edge {
 // String returns the source in dot notation.
 func (g Graph) String() string {
 	b := new(bytes.Buffer)
+	g.Write(b)
+	return b.String()
+}
+
+// String returns the source in dot notation.
+func (g Graph) Write(b io.Writer) {
 	fmt.Fprintf(b, "%s{", g.graphType)
 	if len(g.id) > 0 {
 		fmt.Fprintf(b, "ID=%q;", g.id)
 	}
 	// subgraphs
 	for _, each := range g.subgraphs {
-		b.WriteString(each.String())
+		each.Write(b)
 	}
 	// graph attributes
 	appendSortedMap(g.AttributesMap.attributes, false, b)
@@ -119,16 +126,15 @@ func (g Graph) String() string {
 			fmt.Fprint(b, ";")
 		}
 	}
-	b.WriteString("}")
-	return b.String()
+	fmt.Fprintf(b, "}")
 }
 
-func appendSortedMap(m map[string]interface{}, mustBracket bool, b *bytes.Buffer) {
+func appendSortedMap(m map[string]interface{}, mustBracket bool, b io.Writer) {
 	if len(m) == 0 {
 		return
 	}
 	if mustBracket {
-		b.WriteString("[")
+		fmt.Fprint(b, "[")
 	}
 	first := true
 	// first collect keys
@@ -146,30 +152,6 @@ func appendSortedMap(m map[string]interface{}, mustBracket bool, b *bytes.Buffer
 		first = false
 	}
 	if mustBracket {
-		b.WriteString("]")
+		fmt.Fprint(b, "]")
 	}
-}
-
-type IndentBuffer struct {
-	buffer *bytes.Buffer
-	level  int
-}
-
-func (i *IndentBuffer) Indent() *IndentBuffer {
-	i.level++
-	i.buffer.WriteString("\t")
-	return i
-}
-
-func (i *IndentBuffer) BackIndent() *IndentBuffer {
-	i.level--
-	return i
-}
-
-func (i *IndentBuffer) NewLine() *IndentBuffer {
-	i.buffer.WriteString("\n")
-	for j := 0; j < i.level; j++ {
-		i.buffer.WriteString("\t")
-	}
-	return i
 }
