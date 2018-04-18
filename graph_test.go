@@ -3,7 +3,7 @@ package dot
 import "testing"
 
 func TestEmpty(t *testing.T) {
-	di := NewDigraph()
+	di := NewGraph(Directed)
 	if got, want := di.String(), `digraph{}`; got != want {
 		t.Log(got)
 		t.Fail()
@@ -11,7 +11,7 @@ func TestEmpty(t *testing.T) {
 }
 
 func TestEmptyWithIDAndAttributes(t *testing.T) {
-	di := NewDigraph()
+	di := NewGraph(Directed)
 	di.ID("test")
 	di.Attr("style", "filled")
 	di.Attr("color", "lightgrey")
@@ -22,7 +22,7 @@ func TestEmptyWithIDAndAttributes(t *testing.T) {
 }
 
 func TestTwoConnectedNodes(t *testing.T) {
-	di := NewDigraph()
+	di := NewGraph(Directed)
 	n1 := di.Node("A")
 	n2 := di.Node("B")
 	di.Edge(n1, n2)
@@ -39,6 +39,14 @@ func TestSubgraph(t *testing.T) {
 	if got, want := di.String(), `digraph{subgraph{ID="s0";label="test",style="filled"}}`; got != want {
 		t.Log(got)
 		t.Fail()
+	}
+}
+
+func TestSubgraphClusterOption(t *testing.T) {
+	di := NewGraph(Directed)
+	sub := di.Subgraph("test", ClusterOption{})
+	if got, want := sub.id, "cluster_s0"; got != want {
+		t.Errorf("got [%v] want [%v]", got, want)
 	}
 }
 

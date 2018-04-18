@@ -8,16 +8,10 @@ import (
 	"strings"
 )
 
-const (
-	Strict     = "strict"
-	Undirected = "graph"
-	Directed   = "digraph"
-	Sub        = "subgraph"
-)
-
 type Graph struct {
 	AttributesMap
 	id        string
+	isCluster bool
 	graphType string
 	seq       int
 	nodes     map[string]Node
@@ -25,18 +19,18 @@ type Graph struct {
 	subgraphs map[string]*Graph
 }
 
-func NewDigraph() *Graph {
-	return NewGraph(Directed)
-}
-
-func NewGraph(graphType string) *Graph {
-	return &Graph{
+func NewGraph(options ...GraphOption) *Graph {
+	graph := &Graph{
 		AttributesMap: AttributesMap{attributes: map[string]interface{}{}},
-		graphType:     graphType,
+		graphType:     Directed.Name,
 		nodes:         map[string]Node{},
 		edgesFrom:     map[string][]Edge{},
 		subgraphs:     map[string]*Graph{},
 	}
+	for _, each := range options {
+		each.Apply(graph)
+	}
+	return graph
 }
 
 func (g *Graph) ID(newID string) *Graph {
@@ -44,8 +38,12 @@ func (g *Graph) ID(newID string) *Graph {
 	return g
 }
 
+func (g *Graph) beCluster() {
+	g.id = "cluster_" + g.id
+}
+
 // Subgraph returns the Graph with the given label ; creates one if absent.
-func (g *Graph) Subgraph(label string) *Graph {
+func (g *Graph) Subgraph(label string, options ...GraphOption) *Graph {
 	sub, ok := g.subgraphs[label]
 	if ok {
 		return sub
@@ -53,6 +51,9 @@ func (g *Graph) Subgraph(label string) *Graph {
 	sub = NewGraph(Sub)
 	sub.Attr("label", label)
 	sub.ID(fmt.Sprintf("s%d", len(g.subgraphs)))
+	for _, each := range options {
+		each.Apply(sub)
+	}
 	g.subgraphs[label] = sub
 	return sub
 }
