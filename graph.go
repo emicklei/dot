@@ -105,19 +105,26 @@ func (g *Graph) Node(id string) Node {
 // Nodes can be have multiple edges to the same other node (or itself).
 // If one or more labels are given then the "label" attribute is set to the edge.
 func (g *Graph) Edge(fromNode, toNode Node, labels ...string) Edge {
+	// assume fromNode owner == toNode owner
+	edgeOwner := g
+	if fromNode.graph != toNode.graph { // 1 or 2 are subgraphs
+		edgeOwner = commonParentOf(fromNode.graph, toNode.graph)
+	}
 	e := Edge{
 		from:          fromNode,
 		to:            toNode,
 		AttributesMap: AttributesMap{attributes: map[string]interface{}{}},
-		graph:         g}
-	if g == nil {
-		panic("g nil")
-	}
-	g.edgesFrom[fromNode.id] = append(g.edgesFrom[fromNode.id], e)
+		graph:         edgeOwner}
 	if len(labels) > 0 {
 		e.Attr("label", strings.Join(labels, ","))
 	}
+	edgeOwner.edgesFrom[fromNode.id] = append(edgeOwner.edgesFrom[fromNode.id], e)
 	return e
+}
+
+func commonParentOf(one *Graph, two *Graph) *Graph {
+	// TODO
+	return one.Root()
 }
 
 // String returns the source in dot notation.
