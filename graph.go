@@ -17,6 +17,7 @@ type Graph struct {
 	nodes     map[string]Node
 	edgesFrom map[string][]Edge
 	subgraphs map[string]*Graph
+	parent    *Graph
 }
 
 func NewGraph(options ...GraphOption) *Graph {
@@ -33,6 +34,7 @@ func NewGraph(options ...GraphOption) *Graph {
 	return graph
 }
 
+// ID sets the identifier of the graph.
 func (g *Graph) ID(newID string) *Graph {
 	g.id = newID
 	return g
@@ -40,6 +42,14 @@ func (g *Graph) ID(newID string) *Graph {
 
 func (g *Graph) beCluster() {
 	g.id = "cluster_" + g.id
+}
+
+// Root returns the top-level graph if this was a subgraph.
+func (g *Graph) Root() *Graph {
+	if g.parent == nil {
+		return g
+	}
+	return g.parent.Root()
 }
 
 // Subgraph returns the Graph with the given label ; creates one if absent.
@@ -54,26 +64,39 @@ func (g *Graph) Subgraph(label string, options ...GraphOption) *Graph {
 	for _, each := range options {
 		each.Apply(sub)
 	}
+	sub.parent = g
 	g.subgraphs[label] = sub
 	return sub
 }
 
+func (g *Graph) findNode(id string) (Node, bool) {
+	if n, ok := g.nodes[id]; ok {
+		return n, ok
+	}
+	if g.parent == nil {
+		return Node{id: "void"}, false
+	}
+	return g.parent.findNode(id)
+}
+
 // Node returns the node created with this id or creates a new node if absent.
 // This method can be used as both a constructor and accessor.
+// not thread safe!
 func (g *Graph) Node(id string) Node {
-	n, ok := g.nodes[id]
-	if ok {
+	if n, ok := g.findNode(id); ok {
 		return n
 	}
-	// create a new
-	g.seq++
-	n = Node{
+	// create a new, use root sequence
+	root := g.Root()
+	root.seq++
+	n := Node{
 		id:  id,
-		seq: g.seq,
+		seq: root.seq,
 		AttributesMap: AttributesMap{attributes: map[string]interface{}{
 			"label": id}},
 		graph: g,
 	}
+	// store local
 	g.nodes[id] = n
 	return n
 }
@@ -87,6 +110,9 @@ func (g *Graph) Edge(fromNode, toNode Node, labels ...string) Edge {
 		to:            toNode,
 		AttributesMap: AttributesMap{attributes: map[string]interface{}{}},
 		graph:         g}
+	if g == nil {
+		panic("g nil")
+	}
 	g.edgesFrom[fromNode.id] = append(g.edgesFrom[fromNode.id], e)
 	if len(labels) > 0 {
 		e.Attr("label", strings.Join(labels, ","))
@@ -101,33 +127,43 @@ func (g Graph) String() string {
 	return b.String()
 }
 
-// String returns the source in dot notation.
-func (g Graph) Write(b io.Writer) {
-	fmt.Fprintf(b, "%s{", g.graphType)
-	if len(g.id) > 0 {
-		fmt.Fprintf(b, "ID=%q;", g.id)
-	}
-	// subgraphs
-	for _, each := range g.subgraphs {
-		each.Write(b)
-	}
-	// graph attributes
-	appendSortedMap(g.AttributesMap.attributes, false, b)
-	// graph nodes
-	for _, each := range g.nodes {
-		fmt.Fprintf(b, "node")
-		appendSortedMap(each.attributes, true, b)
-		fmt.Fprintf(b, "n%d;", each.seq)
-	}
-	// graph edges
-	for _, all := range g.edgesFrom {
-		for _, each := range all {
-			fmt.Fprintf(b, "n%d->n%d", each.from.seq, each.to.seq)
-			appendSortedMap(each.attributes, true, b)
-			fmt.Fprint(b, ";")
+func (g Graph) Write(w io.Writer) {
+	g.IndentedWrite(NewIndentWriter(w))
+}
+
+// IndentedWrite write the graph to a writer using simple TAB indentation.
+func (g Graph) IndentedWrite(w *IndentWriter) {
+	fmt.Fprintf(w, "%s %s {", g.graphType, g.id)
+	w.NewLineIndentWhile(func() {
+		if len(g.id) > 0 {
+			fmt.Fprintf(w, "ID = %q;", g.id)
+			w.NewLine()
 		}
-	}
-	fmt.Fprintf(b, "}")
+		// subgraphs
+		for _, each := range g.subgraphs {
+			each.IndentedWrite(w)
+		}
+		// graph attributes
+		appendSortedMap(g.AttributesMap.attributes, false, w)
+		w.NewLine()
+		// graph nodes
+		for _, each := range g.nodes {
+			fmt.Fprintf(w, "node")
+			appendSortedMap(each.attributes, true, w)
+			fmt.Fprintf(w, " n%d;", each.seq)
+			w.NewLine()
+		}
+		// graph edges
+		for _, all := range g.edgesFrom {
+			for _, each := range all {
+				fmt.Fprintf(w, "n%d->n%d", each.from.seq, each.to.seq)
+				appendSortedMap(each.attributes, true, w)
+				fmt.Fprint(w, ";")
+				w.NewLine()
+			}
+		}
+	})
+	fmt.Fprintf(w, "}")
 }
 
 func appendSortedMap(m map[string]interface{}, mustBracket bool, b io.Writer) {
@@ -147,12 +183,18 @@ func appendSortedMap(m map[string]interface{}, mustBracket bool, b io.Writer) {
 
 	for _, k := range keys {
 		if !first {
-			fmt.Fprintf(b, ",")
+			if mustBracket {
+				fmt.Fprint(b, ",")
+			} else {
+				fmt.Fprintf(b, ";")
+			}
 		}
 		fmt.Fprintf(b, "%s=%q", k, m[k])
 		first = false
 	}
 	if mustBracket {
 		fmt.Fprint(b, "]")
+	} else {
+		fmt.Fprint(b, ";")
 	}
 }
