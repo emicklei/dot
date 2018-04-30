@@ -38,8 +38,8 @@ func TestSubgraph(t *testing.T) {
 	di := NewGraph(Directed)
 	sub := di.Subgraph("test")
 	sub.Attr("style", "filled")
-	if got, want := flatten(di.String()), `digraph{subgraph{ID="s0";label="test",style="filled";}}`; got != want {
-		t.Errorf("got [%v] want [%v]", got, want)
+	if got, want := flatten(di.String()), `digraph  {subgraph s0 {ID = "s0";label="test";style="filled";}}`; got != want {
+		t.Errorf("got\n[%v] want\n[%v]", got, want)
 	}
 }
 
@@ -71,12 +71,8 @@ func TestCluster(t *testing.T) {
 	clusterB := di.Subgraph("Cluster B", ClusterOption{})
 	insideThree := clusterB.Node("three")
 	insideFour := clusterB.Node("four")
-	outside.Edge(insideThree)
-	insideThree.Edge(insideOne)
-	insideOne.Edge(insideTwo)
-	insideTwo.Edge(insideFour)
-	insideFour.Edge(outside)
-	ioutil.WriteFile("cluster.dot", []byte(di.String()), os.ModePerm)
+	outside.Edge(insideFour).Edge(insideOne).Edge(insideTwo).Edge(insideThree).Edge(outside)
+	ioutil.WriteFile("doc/cluster.dot", []byte(di.String()), os.ModePerm)
 }
 
 // remove tabs and newlines and spaces

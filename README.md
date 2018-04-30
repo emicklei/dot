@@ -42,6 +42,27 @@ Subgraphs
 	s := g.Subgraph("cluster")
 	s.Attr("style","filled")
 
+## cluster example
+
+![](./doc/cluster.png)
+
+	di := dot.NewGraph(dot.Directed)
+	outside := di.Node("Outside")
+
+	// A
+	clusterA := di.Subgraph("Cluster A", ClusterOption{})
+	insideOne := clusterA.Node("one")
+	insideTwo := clusterA.Node("two")
+	
+	// B
+	clusterB := di.Subgraph("Cluster B", ClusterOption{})
+	insideThree := clusterB.Node("three")
+	insideFour := clusterB.Node("four")
+
+	// edges
+	outside.Edge(insideFour).Edge(insideOne).Edge(insideTwo).Edge(insideThree).Edge(outside)
+
+
 ## test your graph
 
 	go run main.go | dot -Tpng  > test.png && open test.png
