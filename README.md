@@ -62,6 +62,9 @@ Subgraphs
 	// edges
 	outside.Edge(insideFour).Edge(insideOne).Edge(insideTwo).Edge(insideThree).Edge(outside)
 
+## About dot attributes
+
+https://graphviz.gitlab.io/_pages/doc/info/attrs.html
 
 ## display your graph
 
