@@ -12,7 +12,7 @@
 	// go run main.go | dot -Tpng  > test.png && open test.png
 	
 	func main() {
-		g := dot.NewDigraph()
+		g := dot.NewGraph(dot.Directed)
 		n1 := g.Node("coding")
 		n2 := g.Node("testing a little").Box()
 	
@@ -50,12 +50,12 @@ Subgraphs
 	outside := di.Node("Outside")
 
 	// A
-	clusterA := di.Subgraph("Cluster A", ClusterOption{})
+	clusterA := di.Subgraph("Cluster A", dot.ClusterOption{})
 	insideOne := clusterA.Node("one")
 	insideTwo := clusterA.Node("two")
 	
 	// B
-	clusterB := di.Subgraph("Cluster B", ClusterOption{})
+	clusterB := di.Subgraph("Cluster B", dot.ClusterOption{})
 	insideThree := clusterB.Node("three")
 	insideFour := clusterB.Node("four")
 
@@ -63,8 +63,8 @@ Subgraphs
 	outside.Edge(insideFour).Edge(insideOne).Edge(insideTwo).Edge(insideThree).Edge(outside)
 
 
-## test your graph
+## display your graph
 
 	go run main.go | dot -Tpng  > test.png && open test.png
 
-(c) 2015, http://ernestmicklei.com. MIT License
+(c) 2015-2018, http://ernestmicklei.com. MIT License
