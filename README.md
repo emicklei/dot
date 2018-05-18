@@ -70,4 +70,8 @@ https://graphviz.gitlab.io/_pages/doc/info/attrs.html
 
 	go run main.go | dot -Tpng  > test.png && open test.png
 
+## xdot parser
+
+The xparser package contains an [xdot](https://www.graphviz.org/doc/info/output.html#d:xdot) parser.
+
 (c) 2015-2018, http://ernestmicklei.com. MIT License
