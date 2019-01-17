@@ -155,9 +155,9 @@ func (g Graph) IndentedWrite(w *IndentWriter) {
 		w.NewLine()
 		// graph nodes
 		for _, each := range g.nodes {
-			fmt.Fprintf(w, "node")
+			fmt.Fprintf(w, "n%d", each.seq)
 			appendSortedMap(each.attributes, true, w)
-			fmt.Fprintf(w, " n%d;", each.seq)
+			fmt.Fprintf(w, ";")
 			w.NewLine()
 		}
 		// graph edges
