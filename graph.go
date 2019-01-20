@@ -122,6 +122,24 @@ func (g *Graph) Edge(fromNode, toNode Node, labels ...string) Edge {
 	return e
 }
 
+// FindEdges finds all edges in the graph that go from the fromNode to the toNode.
+// Otherwise, returns an empty slice.
+func (g *Graph) FindEdges(fromNode, toNode Node) (found []Edge) {
+	found = make([]Edge, 0)
+	edgeOwner := g
+	if fromNode.graph != toNode.graph {
+		edgeOwner = commonParentOf(fromNode.graph, toNode.graph)
+	}
+	if edges, ok := edgeOwner.edgesFrom[fromNode.id]; ok {
+		for _, e := range edges {
+			if e.to.id == toNode.id {
+				found = append(found, e)
+			}
+		}
+	}
+	return found
+}
+
 func commonParentOf(one *Graph, two *Graph) *Graph {
 	// TODO
 	return one.Root()
