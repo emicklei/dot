@@ -29,7 +29,7 @@ func TestTwoConnectedNodes(t *testing.T) {
 	n1 := di.Node("A")
 	n2 := di.Node("B")
 	di.Edge(n1, n2)
-	if got, want := flatten(di.String()), `digraph  {node[label="A"] n1;node[label="B"] n2;n1->n2;}`; got != want {
+	if got, want := flatten(di.String()), `digraph  {n1[label="A"];n2[label="B"];n1->n2;}`; got != want {
 		t.Errorf("got [%v] want [%v]", got, want)
 	}
 }
@@ -56,7 +56,7 @@ func TestEdgeLabel(t *testing.T) {
 	n1 := di.Node("n1")
 	n2 := di.Node("n2")
 	n1.Edge(n2, "wat")
-	if got, want := flatten(di.String()), `digraph  {node[label="n1"] n1;node[label="n2"] n2;n1->n2[label="wat"];}`; got != want {
+	if got, want := flatten(di.String()), `digraph  {n1[label="n1"];n2[label="n2"];n1->n2[label="wat"];}`; got != want {
 		t.Errorf("got [%v] want [%v]", got, want)
 	}
 }
