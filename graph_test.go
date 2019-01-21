@@ -3,6 +3,7 @@ package dot
 import (
 	"io/ioutil"
 	"os"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -31,6 +32,17 @@ func TestTwoConnectedNodes(t *testing.T) {
 	di.Edge(n1, n2)
 	if got, want := flatten(di.String()), `digraph  {node[label="A"] n1;node[label="B"] n2;n1->n2;}`; got != want {
 		t.Errorf("got [%v] want [%v]", got, want)
+	}
+}
+
+func TestGraph_FindEdges(t *testing.T) {
+	di := NewGraph(Directed)
+	n1 := di.Node("A")
+	n2 := di.Node("B")
+	want := []Edge{di.Edge(n1, n2)}
+	got := di.FindEdges(n1, n2)
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("TestGraph.FindEdges() = %v, want %v", got, want)
 	}
 }
 

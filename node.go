@@ -23,3 +23,8 @@ func (n Node) Box() Node {
 func (n Node) Edge(toNode Node, labels ...string) Edge {
 	return n.graph.Edge(n, toNode, labels...)
 }
+
+// EdgesTo returns all existing edges between this Node and the argument Node.
+func (n Node) EdgesTo(toNode Node) []Edge {
+	return n.graph.FindEdges(n, toNode)
+}
