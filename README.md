@@ -1,5 +1,9 @@
 ## dot - little helper package in Go for the graphviz dot language
 
+[![Build Status](https://travis-ci.org/emicklei/proto.png)](https://travis-ci.org/emicklei/dot)
+[![Go Report Card](https://goreportcard.com/badge/github.com/emicklei/dot)](https://goreportcard.com/report/github.com/emicklei/dot)
+[![GoDoc](https://godoc.org/github.com/emicklei/dot?status.svg)](https://godoc.org/github.com/emicklei/dot)
+
 [DOT language](http://www.graphviz.org/doc/info/lang.html)
 
 	package main
