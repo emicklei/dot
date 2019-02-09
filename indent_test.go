@@ -18,5 +18,13 @@ func TestIndentWriter(t *testing.T) {
 		i.WriteString("}")
 	})
 	i.WriteString("}")
-	fmt.Println(b.String())
+	got := b.String()
+	want := `doc {
+	chapter {
+		chapter text
+	}
+}`
+	if got != want {
+		t.Fail()
+	}
 }
