@@ -180,7 +180,7 @@ func (g Graph) IndentedWrite(w *IndentWriter) {
 		}
 		// graph edges
 		denoteEdge := "->"
-		if g.graphType == "graph"{
+		if g.graphType == "graph" {
 			denoteEdge = "--"
 		}
 		for _, all := range g.edgesFrom {
