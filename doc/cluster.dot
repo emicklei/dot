@@ -2,21 +2,21 @@ digraph  {
 	subgraph cluster_s1 {
 		ID = "cluster_s1";
 		label="Cluster B";
-		node[label="three"] n4;
-		node[label="four"] n5;
+		n4[label="three"];
+		n5[label="four"];
 		
 	}subgraph cluster_s0 {
 		ID = "cluster_s0";
 		label="Cluster A";
-		node[label="two"] n3;
-		node[label="one"] n2;
+		n2[label="one"];
+		n3[label="two"];
 		
 	}
-	node[label="Outside"] n1;
+	n1[label="Outside"];
+	n1->n5;
+	n5->n2;
 	n2->n3;
 	n3->n4;
 	n4->n1;
-	n1->n5;
-	n5->n2;
 	
 }
