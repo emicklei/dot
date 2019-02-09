@@ -179,9 +179,13 @@ func (g Graph) IndentedWrite(w *IndentWriter) {
 			w.NewLine()
 		}
 		// graph edges
+		denoteEdge := "->"
+		if g.graphType == "graph"{
+			denoteEdge = "--"
+		}
 		for _, all := range g.edgesFrom {
 			for _, each := range all {
-				fmt.Fprintf(w, "n%d->n%d", each.from.seq, each.to.seq)
+				fmt.Fprintf(w, "n%d%sn%d", each.from.seq, denoteEdge, each.to.seq)
 				appendSortedMap(each.attributes, true, w)
 				fmt.Fprint(w, ";")
 				w.NewLine()
