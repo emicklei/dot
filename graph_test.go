@@ -25,6 +25,15 @@ func TestEmptyWithIDAndAttributes(t *testing.T) {
 	}
 }
 
+func TestEmptyWithHTMLLabel(t *testing.T) {
+	di := NewGraph(Directed)
+	di.ID("test")
+	di.Attr("label", HTML("<B>Hi</B>"))
+	if got, want := flatten(di.String()), `digraph test {ID = "test";label=<<B>Hi</B>>;}`; got != want {
+		t.Errorf("got [%v] want [%v]", got, want)
+	}
+}
+
 func TestTwoConnectedNodes(t *testing.T) {
 	di := NewGraph(Directed)
 	n1 := di.Node("A")
