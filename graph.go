@@ -221,7 +221,11 @@ func appendSortedMap(m map[string]interface{}, mustBracket bool, b io.Writer) {
 				fmt.Fprintf(b, ";")
 			}
 		}
-		fmt.Fprintf(b, "%s=%q", k, m[k])
+		if html, isHTML := m[k].(HTML); isHTML {
+			fmt.Fprintf(b, "%s=<%s>", k, html)
+		} else {
+			fmt.Fprintf(b, "%s=%q", k, m[k])
+		}
 		first = false
 	}
 	if mustBracket {

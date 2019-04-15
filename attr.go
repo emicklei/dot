@@ -1,5 +1,9 @@
 package dot
 
+// HTML renders the provided content as graphviz HTML. Use of this
+// type is only valid for some attributes, like the 'label' attribute.
+type HTML string
+
 // AttributesMap holds attribute=value pairs.
 type AttributesMap struct {
 	attributes map[string]interface{}
