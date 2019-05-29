@@ -18,6 +18,7 @@ type Graph struct {
 	edgesFrom map[string][]Edge
 	subgraphs map[string]*Graph
 	parent    *Graph
+	sameRank  map[string][]Node
 }
 
 func NewGraph(options ...GraphOption) *Graph {
@@ -27,6 +28,7 @@ func NewGraph(options ...GraphOption) *Graph {
 		nodes:         map[string]Node{},
 		edgesFrom:     map[string][]Edge{},
 		subgraphs:     map[string]*Graph{},
+		sameRank:      map[string][]Node{},
 	}
 	for _, each := range options {
 		each.Apply(graph)
@@ -145,6 +147,11 @@ func commonParentOf(one *Graph, two *Graph) *Graph {
 	return one.Root()
 }
 
+// AddToSameRank adds the given nodes to the specified rank group, forcing them to be rendered in the same row
+func (g *Graph) AddToSameRank(group string, nodes ...Node) {
+	g.sameRank[group] = append(g.sameRank[group], nodes...)
+}
+
 // String returns the source in dot notation.
 func (g Graph) String() string {
 	b := new(bytes.Buffer)
@@ -193,6 +200,14 @@ func (g Graph) IndentedWrite(w *IndentWriter) {
 				fmt.Fprint(w, ";")
 				w.NewLine()
 			}
+		}
+		for _, nodes := range g.sameRank {
+			str := ""
+			for _, n := range nodes {
+				str += fmt.Sprintf("n%d;", n.seq)
+			}
+			fmt.Fprintf(w, "{rank=same; %s};", str)
+			w.NewLine()
 		}
 	})
 	fmt.Fprintf(w, "}")
