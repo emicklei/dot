@@ -223,6 +223,8 @@ func appendSortedMap(m map[string]interface{}, mustBracket bool, b io.Writer) {
 		}
 		if html, isHTML := m[k].(HTML); isHTML {
 			fmt.Fprintf(b, "%s=<%s>", k, html)
+		} else if literal, isLiteral := m[k].(Literal); isLiteral {
+			fmt.Fprintf(b, "%s=%s", k, literal)
 		} else {
 			fmt.Fprintf(b, "%s=%q", k, m[k])
 		}
