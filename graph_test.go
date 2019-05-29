@@ -82,6 +82,19 @@ func TestEdgeLabel(t *testing.T) {
 	}
 }
 
+func TestSameRank(t *testing.T) {
+	di := NewGraph(Directed)
+	foo1 := di.Node("foo1")
+	foo2 := di.Node("foo2")
+	bar := di.Node("bar")
+	foo1.Edge(foo2)
+	foo1.Edge(bar)
+	di.AddToSameRank("top-row", foo1, foo2)
+	if got, want := flatten(di.String()), `digraph  {n3[label="bar"];n1[label="foo1"];n2[label="foo2"];n1->n2;n1->n3;{rank=same; n1;n2;};}`; got != want {
+		t.Errorf("got [%v] want [%v]", got, want)
+	}
+}
+
 // dot -Tpng cluster.dot > cluster.png && open cluster.png
 func TestCluster(t *testing.T) {
 	di := NewGraph(Directed)
