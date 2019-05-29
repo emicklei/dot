@@ -14,6 +14,11 @@ func (n Node) Attr(label string, value interface{}) Node {
 	return n
 }
 
+// Label sets the attribute "label" to the given label
+func (n Node) Label(label string) Node {
+	return n.Attr("label", label)
+}
+
 // Box sets the attribute "shape" to "box"
 func (n Node) Box() Node {
 	return n.Attr("shape", "box")
