@@ -34,6 +34,15 @@ func TestEmptyWithHTMLLabel(t *testing.T) {
 	}
 }
 
+func TestEmptyWithLiteralValueLabel(t *testing.T) {
+	di := NewGraph(Directed)
+	di.ID("test")
+	di.Attr("label", Literal(`"left-justified text\l"`))
+	if got, want := flatten(di.String()), `digraph test {ID = "test";label="left-justified text\l";}`; got != want {
+		t.Errorf("got [%v] want [%v]", got, want)
+	}
+}
+
 func TestTwoConnectedNodes(t *testing.T) {
 	di := NewGraph(Directed)
 	n1 := di.Node("A")
