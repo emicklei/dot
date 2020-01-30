@@ -20,7 +20,7 @@ func TestEmptyWithIDAndAttributes(t *testing.T) {
 	di.ID("test")
 	di.Attr("style", "filled")
 	di.Attr("color", "lightgrey")
-	if got, want := flatten(di.String()), `digraph test {ID = "test";color="lightgrey";style="filled";}`; got != want {
+	if got, want := flatten(di.String()), `digraph test {color="lightgrey";style="filled";}`; got != want {
 		t.Errorf("got [%v] want [%v]", got, want)
 	}
 }
@@ -29,7 +29,7 @@ func TestEmptyWithHTMLLabel(t *testing.T) {
 	di := NewGraph(Directed)
 	di.ID("test")
 	di.Attr("label", HTML("<B>Hi</B>"))
-	if got, want := flatten(di.String()), `digraph test {ID = "test";label=<<B>Hi</B>>;}`; got != want {
+	if got, want := flatten(di.String()), `digraph test {label=<<B>Hi</B>>;}`; got != want {
 		t.Errorf("got [%v] want [%v]", got, want)
 	}
 }
@@ -38,7 +38,7 @@ func TestEmptyWithLiteralValueLabel(t *testing.T) {
 	di := NewGraph(Directed)
 	di.ID("test")
 	di.Attr("label", Literal(`"left-justified text\l"`))
-	if got, want := flatten(di.String()), `digraph test {ID = "test";label="left-justified text\l";}`; got != want {
+	if got, want := flatten(di.String()), `digraph test {label="left-justified text\l";}`; got != want {
 		t.Errorf("got [%v] want [%v]", got, want)
 	}
 }
@@ -66,9 +66,13 @@ func TestGraph_FindEdges(t *testing.T) {
 
 func TestSubgraph(t *testing.T) {
 	di := NewGraph(Directed)
-	sub := di.Subgraph("test")
+	sub := di.Subgraph("test-id")
 	sub.Attr("style", "filled")
-	if got, want := flatten(di.String()), `digraph  {subgraph s0 {ID = "s0";label="test";style="filled";}}`; got != want {
+	if got, want := flatten(di.String()), `digraph  {subgraph s1 {label="test-id";style="filled";}}`; got != want {
+		t.Errorf("got\n[%v] want\n[%v]", got, want)
+	}
+	sub.Label("new-label")
+	if got, want := flatten(di.String()), `digraph  {subgraph s1 {label="new-label";style="filled";}}`; got != want {
 		t.Errorf("got\n[%v] want\n[%v]", got, want)
 	}
 }
@@ -76,17 +80,17 @@ func TestSubgraph(t *testing.T) {
 func TestSubgraphClusterOption(t *testing.T) {
 	di := NewGraph(Directed)
 	sub := di.Subgraph("test", ClusterOption{})
-	if got, want := sub.id, "cluster_s0"; got != want {
+	if got, want := sub.id, "cluster_s1"; got != want {
 		t.Errorf("got [%v] want [%v]", got, want)
 	}
 }
 
 func TestEdgeLabel(t *testing.T) {
 	di := NewGraph(Directed)
-	n1 := di.Node("n1")
-	n2 := di.Node("n2")
-	n1.Edge(n2, "wat")
-	if got, want := flatten(di.String()), `digraph  {n1[label="n1"];n2[label="n2"];n1->n2[label="wat"];}`; got != want {
+	n1 := di.Node("e1")
+	n2 := di.Node("e2")
+	n1.Edge(n2, "what")
+	if got, want := flatten(di.String()), `digraph  {n1[label="e1"];n2[label="e2"];n1->n2[label="what"];}`; got != want {
 		t.Errorf("got [%v] want [%v]", got, want)
 	}
 }
@@ -121,4 +125,13 @@ func TestCluster(t *testing.T) {
 // remove tabs and newlines and spaces
 func flatten(s string) string {
 	return strings.Replace((strings.Replace(s, "\n", "", -1)), "\t", "", -1)
+}
+
+func TestDeleteLabel(t *testing.T) {
+	g := NewGraph()
+	n := g.Node("my-id")
+	n.AttributesMap.Delete("label")
+	if got, want := flatten(g.String()), `digraph  {n1;}`; got != want {
+		t.Errorf("got [%v] want [%v]", got, want)
+	}
 }
