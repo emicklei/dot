@@ -1,5 +1,12 @@
 # Version history of the dot package
 
+## v0.10.2 - 2020-01-31 
+
+- Fix indexing subgraphs by label ; must use id. Issue #16
+- Add Label(newLabel) to Graph
+- Add Delete(key) to AttributesMap
+- Use internal ids for subgraphs
+
 ## v0.10.0
 
 - Allow setting same rank for a group of nodes
