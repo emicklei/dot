@@ -36,3 +36,8 @@ func (a AttributesMap) Attr(label string, value interface{}) {
 func (a AttributesMap) Value(label string) interface{} {
 	return a.attributes[label]
 }
+
+// Delete removes the attribute value at key, if any
+func (a AttributesMap) Delete(key string) {
+	delete(a.attributes, key)
+}
