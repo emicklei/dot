@@ -1,3 +1,3 @@
-module github.com/emicklei/dot
+module github.com/SteffiPeTaffy/dot
 
 go 1.13
