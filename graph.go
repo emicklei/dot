@@ -283,6 +283,7 @@ func (g Graph) FindNodeById(id string) (foundNode Node, found bool) {
 		if node.id == id {
 			found = true
 			foundNode = node
+			return
 		}
 	})
 	return
