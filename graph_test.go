@@ -179,3 +179,18 @@ func TestGraph_FindNodeById_multiNodesInSubGraphs(t *testing.T) {
 		t.Errorf("got [%v] want [%v]", got, want)
 	}
 }
+
+func TestGraph_FindNodes_multiNodesInSubGraphs(t *testing.T) {
+	di := NewGraph(Directed)
+	di.Node("A")
+	di.Node("B")
+	sub := di.Subgraph("new subgraph")
+	sub.Node("C")
+
+	nodes := di.FindNodes()
+
+	if got, want := len(nodes), 3; got != want {
+		t.Errorf("got [%v] want [%v]", got, want)
+	}
+}
+

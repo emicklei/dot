@@ -288,3 +288,12 @@ func (g Graph) FindNodeById(id string) (foundNode Node, found bool) {
 	})
 	return
 }
+
+// FindNodes returns all nodes recursively
+func (g Graph) FindNodes() (nodes []Node) {
+	var foundNodes []Node
+	g.VisitNodes(func(node Node) {
+		foundNodes = append(foundNodes, node)
+	})
+	return foundNodes
+}
