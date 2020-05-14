@@ -265,3 +265,40 @@ func appendSortedMap(m map[string]interface{}, mustBracket bool, b io.Writer) {
 		fmt.Fprint(b, ";")
 	}
 }
+
+// VisitNodes visits all nodes recursively
+func (g Graph) VisitNodes(callback func(node Node) (done bool)) {
+	for _, node := range g.nodes {
+		done := callback(node)
+		if done {
+			return
+		}
+	}
+
+	for _, subGraph := range g.subgraphs {
+		subGraph.VisitNodes(callback)
+	}
+}
+
+// FindNodeById return node by id
+func (g Graph) FindNodeById(id string) (foundNode Node, found bool) {
+	g.VisitNodes(func(node Node) (done bool) {
+		if node.id == id {
+			found = true
+			foundNode = node
+			return true
+		}
+		return false
+	})
+	return
+}
+
+// FindNodes returns all nodes recursively
+func (g Graph) FindNodes() (nodes []Node) {
+	var foundNodes []Node
+	g.VisitNodes(func(node Node) (done bool) {
+		foundNodes = append(foundNodes, node)
+		return false
+	})
+	return foundNodes
+}
