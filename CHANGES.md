@@ -1,4 +1,9 @@
-# Version history of the dot package
+# Change history of the dot package
+
+## v0.11.0 - 2020-05-16
+
+- add functionality to find node by id
+- add function to find all nodes of a graph
 
 ## v0.10.2 - 2020-01-31 
 
