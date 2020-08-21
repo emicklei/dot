@@ -20,6 +20,27 @@ func (e Edge) Label(value interface{}) Edge {
 	return e
 }
 
+// Solid sets the edge attribute "style" to "solid"
+// Default style
+func (e Edge) Solid() Edge {
+	return e.Attr("style", "solid")
+}
+
+// Bold sets the edge attribute "style" to "bold"
+func (e Edge) Bold() Edge {
+	return e.Attr("style", "bold")
+}
+
+// Dashed sets the edge attribute "style" to "dashed"
+func (e Edge) Dashed() Edge {
+	return e.Attr("style", "dashed")
+}
+
+// Dotted sets the edge attribute "style" to "dotted"
+func (e Edge) Dotted() Edge {
+	return e.Attr("style", "dotted")
+}
+
 // Edge returns a new Edge between the "to" node of this Edge and the argument Node.
 func (e Edge) Edge(to Node, labels ...string) Edge {
 	return e.graph.Edge(e.to, to, labels...)
