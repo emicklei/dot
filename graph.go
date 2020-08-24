@@ -65,6 +65,17 @@ func (g *Graph) Root() *Graph {
 	return g.parent.Root()
 }
 
+// FindSubgraph returns the subgraph of the graph or one from its parents.
+func (g *Graph) FindSubgraph(id string) (*Graph, bool) {
+	sub, ok := g.subgraphs[id]
+	if !ok {
+		if g.parent != nil {
+			return g.parent.FindSubgraph(id)
+		}
+	}
+	return sub, ok
+}
+
 // Subgraph returns the Graph with the given id ; creates one if absent.
 // The label attribute is also set to the id ; use Label() to overwrite it.
 func (g *Graph) Subgraph(id string, options ...GraphOption) *Graph {

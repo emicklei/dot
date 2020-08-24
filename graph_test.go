@@ -75,6 +75,16 @@ func TestSubgraph(t *testing.T) {
 	if got, want := flatten(di.String()), `digraph  {subgraph s1 {label="new-label";style="filled";}}`; got != want {
 		t.Errorf("got\n[%v] want\n[%v]", got, want)
 	}
+	found, _ := di.FindSubgraph("test-id")
+	if got, want := found, sub; got != want {
+		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
+	}
+	subsub := sub.Subgraph("sub-test-id")
+	found, _ = subsub.FindSubgraph("test-id")
+	if got, want := found, sub; got != want {
+		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
+	}
+
 }
 
 func TestSubgraphClusterOption(t *testing.T) {
@@ -193,4 +203,3 @@ func TestGraph_FindNodes_multiNodesInSubGraphs(t *testing.T) {
 		t.Errorf("got [%v] want [%v]", got, want)
 	}
 }
-
