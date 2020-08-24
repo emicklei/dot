@@ -1,5 +1,13 @@
 # Change history of the dot package
 
+## v0.13.0 - 2020-08-22
+
+- add FindSubgraph
+
+## v0.12.0 - 2020-08-20
+
+- Added style methods to Edge to easily add bold,dotted and dashed lines. (#21)
+
 ## v0.11.0 - 2020-05-16
 
 - add functionality to find node by id
