@@ -1,5 +1,9 @@
 # Change history of the dot package
 
+## v0.14.0 - 2020-08-25
+
+- add Attrs for conveniently adding multiple label=value attribute pairs.
+
 ## v0.13.0 - 2020-08-22
 
 - add FindSubgraph
