@@ -203,3 +203,25 @@ func TestGraph_FindNodes_multiNodesInSubGraphs(t *testing.T) {
 		t.Errorf("got [%v] want [%v]", got, want)
 	}
 }
+
+func TestGraphNodeInitializer(t *testing.T) {
+	di := NewGraph(Directed)
+	di.NodeInitializer(func(n Node) {
+		n.Attr("test", "test")
+	})
+	n := di.Node("A")
+	if got, want := n.attributes["test"], "test"; got != want {
+		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
+	}
+}
+
+func TestGraphEdgeInitializer(t *testing.T) {
+	di := NewGraph(Directed)
+	di.EdgeInitializer(func(e Edge) {
+		e.Attr("test", "test")
+	})
+	e := di.Node("A").Edge(di.Node("B"))
+	if got, want := e.attributes["test"], "test"; got != want {
+		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
+	}
+}
