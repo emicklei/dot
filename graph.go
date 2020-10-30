@@ -116,10 +116,12 @@ func (g *Graph) nextSeq() int {
 	return root.seq
 }
 
+// NodeInitializer sets a function that is called (if not nil) when a Node is implicitly created.
 func (g *Graph) NodeInitializer(callback func(n Node)) {
 	g.nodeInitializer = callback
 }
 
+// EdgeInitializer sets a function that is called (if not nil) when an Edge is implicitly created.
 func (g *Graph) EdgeInitializer(callback func(e Edge)) {
 	g.edgeInitializer = callback
 }

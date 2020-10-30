@@ -234,3 +234,12 @@ func TestGraphEdgeInitializer(t *testing.T) {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 }
+
+func TestGraphCreateNodeOnce(t *testing.T) {
+	di := NewGraph(Undirected)
+	n1 := di.Node("A")
+	n2 := di.Node("A")
+	if got, want := n1, n2; &n1 == &n2 {
+		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
+	}
+}
