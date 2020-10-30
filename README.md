@@ -74,4 +74,4 @@ https://graphviz.gitlab.io/_pages/doc/info/attrs.html
 
 	go run main.go | dot -Tpng  > test.png && open test.png
 
-(c) 2015-2018, http://ernestmicklei.com. MIT License
+(c) 2015-2020, http://ernestmicklei.com. MIT License

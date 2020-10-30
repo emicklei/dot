@@ -1,5 +1,11 @@
 # Change history of the dot package
 
+
+## v0.15.0 - 2020-10-30
+
+- add Node initializer, see Issue #15
+- add Edge initializer
+
 ## v0.14.0 - 2020-08-25
 
 - add Attrs for conveniently adding multiple label=value attribute pairs.
