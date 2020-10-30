@@ -203,3 +203,12 @@ func TestGraph_FindNodes_multiNodesInSubGraphs(t *testing.T) {
 		t.Errorf("got [%v] want [%v]", got, want)
 	}
 }
+
+func TestLabelWithEscaping(t *testing.T) {
+	di := NewGraph(Directed)
+	n := di.Node("without linefeed")
+	n.Attr("label", Literal(`"with \l linefeed"`))
+	if got, want := flatten(di.String()), `digraph  {n1[label="with \l linefeed"];}`; got != want {
+		t.Errorf("got [%v] want [%v]", got, want)
+	}
+}
