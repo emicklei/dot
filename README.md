@@ -46,6 +46,28 @@ Subgraphs
 	s := g.Subgraph("cluster")
 	s.Attr("style","filled")
 
+
+Initializers
+
+	g := dot.NewGraph(dot.Directed)
+	g.NodeInitializer(func(n dot.Node) {
+		n.Attr("shape", "rectangle")
+		n.Attr("fontname", "arial")
+		n.Attr("style", "rounded,filled")
+	})
+
+	g.EdgeInitializer(func(e dot.Edge) {
+		e.Attr("fontname", "arial")
+		e.Attr("fontsize", "9")
+		e.Attr("arrowsize", "0.8")
+		e.Attr("arrowhead", "open")
+	})
+
+HTML and Literal values
+
+	node.Attr("label", Literal(`"left-justified text\l"`))
+	graph.Attr("label", HTML("<B>Hi</B>"))
+
 ## cluster example
 
 ![](./doc/cluster.png)
