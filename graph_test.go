@@ -34,6 +34,19 @@ func TestEmptyWithHTMLLabel(t *testing.T) {
 	}
 }
 
+func TestDeleteNode(t *testing.T) {
+	di := NewGraph(Directed)
+	n1 := di.Node("A")
+	n2 := di.Node("B")
+	n3 := di.Node("C")
+	di.Edge(n1, n2)
+	di.Edge(n2, n3)
+	di.DeleteNode("B")
+	if got, want := flatten(di.String()), `digraph  {n1[label="A"];n3[label="C"];}`; got != want {
+		t.Errorf("got [%v] want [%v]", got, want)
+	}
+}
+
 func TestEmptyWithLiteralValueLabel(t *testing.T) {
 	di := NewGraph(Directed)
 	di.ID("test")
