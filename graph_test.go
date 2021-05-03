@@ -39,10 +39,25 @@ func TestDeleteNode(t *testing.T) {
 	n1 := di.Node("A")
 	n2 := di.Node("B")
 	n3 := di.Node("C")
+	di.Edge(n1, n2) // Will be deleted
+	di.Edge(n2, n3) // Will also be deleted
+	di.Edge(n1, n3) // Must not be deleted
+	wasDeleted := di.DeleteNode("B")
+	if got, want := flatten(di.String()), `digraph  {n1[label="A"];n3[label="C"];n1->n3;}`; wasDeleted && got != want {
+		t.Errorf("got [%v] want [%v]", got, want)
+	}
+}
+
+func TestDeleteNodeWhenNodeDoesNotExist(t *testing.T) {
+	di := NewGraph(Directed)
+	n1 := di.Node("A")
+	n2 := di.Node("B")
+	n3 := di.Node("C")
 	di.Edge(n1, n2)
 	di.Edge(n2, n3)
-	di.DeleteNode("B")
-	if got, want := flatten(di.String()), `digraph  {n1[label="A"];n3[label="C"];}`; got != want {
+	wasDeleted := di.DeleteNode("D")
+
+	if got, want := flatten(di.String()), `digraph  {n1[label="A"];n2[label="B"];n3[label="C"];n1->n2;n2->n3;}`; !wasDeleted && got != want {
 		t.Errorf("got [%v] want [%v]", got, want)
 	}
 }

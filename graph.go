@@ -150,26 +150,25 @@ func (g *Graph) Node(id string) Node {
 }
 
 // DeleteNode deletes a node and all the edges associated to the node
-func (g *Graph) DeleteNode(id string) error {
+// Returns false if the node wasn't found, true otherwise
+func (g *Graph) DeleteNode(id string) bool {
 	if _, ok := g.findNode(id); ok {
 		// Remove Node
 		delete(g.nodes, id)
 		// Remove all the edges from the Node
 		delete(g.edgesFrom, id)
-		fmt.Printf("%+v", g.edgesFrom)
 		// Remove all the edges to the Node
 		for parent, edgeList := range g.edgesFrom {
 			for i, edge := range edgeList {
 				if edge.to.id == id {
 					g.edgesFrom[parent] = append(g.edgesFrom[parent][:i], g.edgesFrom[parent][i+1:]...)
+					break
 				}
 			}
 		}
-
-		return nil
-	} else {
-		return fmt.Errorf("Node %v not found", id)
+		return true
 	}
+	return false
 }
 
 // Edge creates a new edge between two nodes.
