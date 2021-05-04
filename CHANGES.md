@@ -1,5 +1,8 @@
 # Change history of the dot package
 
+## v0.16.0 - 2021-05-04
+
+- add DeleteNote, see https://github.com/emicklei/dot/pull/24
 
 ## v0.15.0 - 2020-10-30
 
