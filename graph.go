@@ -149,6 +149,28 @@ func (g *Graph) Node(id string) Node {
 	return n
 }
 
+// DeleteNode deletes a node and all the edges associated to the node
+// Returns false if the node wasn't found, true otherwise
+func (g *Graph) DeleteNode(id string) bool {
+	if _, ok := g.findNode(id); ok {
+		// Remove Node
+		delete(g.nodes, id)
+		// Remove all the edges from the Node
+		delete(g.edgesFrom, id)
+		// Remove all the edges to the Node
+		for parent, edgeList := range g.edgesFrom {
+			for i, edge := range edgeList {
+				if edge.to.id == id {
+					g.edgesFrom[parent] = append(g.edgesFrom[parent][:i], g.edgesFrom[parent][i+1:]...)
+					break
+				}
+			}
+		}
+		return true
+	}
+	return false
+}
+
 // Edge creates a new edge between two nodes.
 // Nodes can be have multiple edges to the same other node (or itself).
 // If one or more labels are given then the "label" attribute is set to the edge.
