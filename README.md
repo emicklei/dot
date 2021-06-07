@@ -90,7 +90,7 @@ HTML and Literal values
 
 ## About dot attributes
 
-https://graphviz.gitlab.io/_pages/doc/info/attrs.html
+https://graphviz.gitlab.io/doc/info/attrs.html
 
 ## display your graph
 
