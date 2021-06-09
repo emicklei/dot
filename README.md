@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.org/emicklei/proto.png)](https://travis-ci.org/emicklei/dot)
 [![Go Report Card](https://goreportcard.com/badge/github.com/emicklei/dot)](https://goreportcard.com/report/github.com/emicklei/dot)
 [![GoDoc](https://pkg.go.dev/badge/github.com/emicklei/dot)](https://pkg.go.dev/github.com/emicklei/dot)
+[![codecov](https://codecov.io/gh/emicklei/dot/branch/master/graph/badge.svg)](https://codecov.io/gh/emicklei/dot)
 
 [DOT language](http://www.graphviz.org/doc/info/lang.html)
 
