@@ -28,3 +28,21 @@ func TestIndentWriter(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestIndentWriter_IndentWhile(t *testing.T) {
+	b := new(bytes.Buffer)
+	i := NewIndentWriter(b)
+	i.IndentWhile(func() {
+		i.WriteString("[")
+		i.IndentWhile(func() {
+			i.WriteString("test")
+		})
+		i.WriteString("]")
+	})
+	got := b.String()
+	want := `	[	test]`
+	if got != want {
+		t.Log(got)
+		t.Fail()
+	}
+}

@@ -25,3 +25,12 @@ func TestAttributesMap_AttrsMissingValue(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestAttributesMap_EmptyKey_NilValue(t *testing.T) {
+	g := NewGraph()
+	g.Attr("", "skip")
+	novalue := interface{}(nil)
+	if got, want := g.Value(""), novalue; got != want {
+		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
+	}
+}

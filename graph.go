@@ -12,7 +12,6 @@ import (
 type Graph struct {
 	AttributesMap
 	id        string
-	isCluster bool
 	graphType string
 	seq       int
 	nodes     map[string]Node

@@ -46,7 +46,7 @@ func (e Edge) Edge(to Node, labels ...string) Edge {
 	return e.graph.Edge(e.to, to, labels...)
 }
 
-// EdgesTo returns all existing edges between the "to" Node of thie Edge and the argument Node.
+// EdgesTo returns all existing edges between the "to" Node of the Edge and the argument Node.
 func (e Edge) EdgesTo(to Node) []Edge {
 	return e.graph.FindEdges(e.to, to)
 }

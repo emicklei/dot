@@ -40,3 +40,18 @@ func TestEdgeStyleHelpers(t *testing.T) {
 		}
 	}
 }
+
+func TestEdgeSetLabel(t *testing.T) {
+	di := NewGraph(Directed)
+	n1 := di.Node("A")
+	n2 := di.Node("B")
+	e := n1.Edge(n2).Label("ab")
+	v := e.Value("label")
+	if s, ok := v.(string); !ok {
+		t.Fail()
+	} else {
+		if s != "ab" {
+			t.Fail()
+		}
+	}
+}

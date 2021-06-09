@@ -15,6 +15,21 @@ func TestEmpty(t *testing.T) {
 	}
 }
 
+func TestOverrideID(t *testing.T) {
+	caught := false
+	defer func() {
+		if r := recover(); r != nil {
+			caught = true
+		}
+	}()
+	di := NewGraph(Directed)
+	di.ID("one")
+	di.ID("two")
+	if !caught {
+		t.Fail()
+	}
+}
+
 func TestEmptyWithIDAndAttributes(t *testing.T) {
 	di := NewGraph(Directed)
 	di.ID("test")
@@ -35,7 +50,7 @@ func TestEmptyWithHTMLLabel(t *testing.T) {
 }
 
 func TestDeleteNode(t *testing.T) {
-	di := NewGraph(Directed)
+	di := NewGraph(Undirected)
 	n1 := di.Node("A")
 	n2 := di.Node("B")
 	n3 := di.Node("C")
@@ -43,7 +58,7 @@ func TestDeleteNode(t *testing.T) {
 	di.Edge(n2, n3) // Will also be deleted
 	di.Edge(n1, n3) // Must not be deleted
 	wasDeleted := di.DeleteNode("B")
-	if got, want := flatten(di.String()), `digraph  {n1[label="A"];n3[label="C"];n1->n3;}`; wasDeleted && got != want {
+	if got, want := flatten(di.String()), `graph  {n1[label="A"];n3[label="C"];n1--n3;}`; wasDeleted && got != want {
 		t.Errorf("got [%v] want [%v]", got, want)
 	}
 }
@@ -90,11 +105,20 @@ func TestGraph_FindEdges(t *testing.T) {
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("TestGraph.FindEdges() = %v, want %v", got, want)
 	}
+	n3 := di.Node("C")
+	n2.Edge(n3)
+	list := want[0].EdgesTo(n3)
+	if len(list) != 1 {
+		t.Fail()
+	}
 }
 
 func TestSubgraph(t *testing.T) {
 	di := NewGraph(Directed)
 	sub := di.Subgraph("test-id")
+	if second := di.Subgraph("test-id"); second != sub {
+		t.Fatal()
+	}
 	sub.Attr("style", "filled")
 	if got, want := flatten(di.String()), `digraph  {subgraph s1 {label="test-id";style="filled";}}`; got != want {
 		t.Errorf("got\n[%v] want\n[%v]", got, want)
@@ -127,8 +151,8 @@ func TestEdgeLabel(t *testing.T) {
 	di := NewGraph(Directed)
 	n1 := di.Node("e1")
 	n2 := di.Node("e2")
-	n1.Edge(n2, "what")
-	if got, want := flatten(di.String()), `digraph  {n1[label="e1"];n2[label="e2"];n1->n2[label="what"];}`; got != want {
+	n1.Edge(n2, "what").Attr("x", "y")
+	if got, want := flatten(di.String()), `digraph  {n1[label="e1"];n2[label="e2"];n1->n2[label="what",x="y"];}`; got != want {
 		t.Errorf("got [%v] want [%v]", got, want)
 	}
 }
@@ -269,5 +293,34 @@ func TestGraphCreateNodeOnce(t *testing.T) {
 	n2 := di.Node("A")
 	if got, want := n1, n2; &n1 == &n2 {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
+	}
+}
+
+func TestGraphCommonParent(t *testing.T) {
+	di := NewGraph(Directed)
+	a := di.Node("a")
+	b := di.Node("b")
+	s1 := di.Subgraph("s1")
+	a1 := s1.Node("a1")
+	b1 := s1.Node("b1")
+	s2 := di.Subgraph("s2")
+	a2 := s2.Node("a2")
+	b2 := s2.Node("b2")
+	a.Edge(a1)
+	b.Edge(b2)
+	e := a2.Edge(b1)
+	if got, want := flatten(di.String()), `digraph  {subgraph s3 {label="s1";n4[label="a1"];n5[label="b1"];}subgraph s6 {label="s2";n7[label="a2"];n8[label="b2"];}n1[label="a"];n2[label="b"];n1->n4;n7->n5;n2->n8;}`; got != want {
+		t.Errorf("got [%v] want [%v]", got, want)
+	}
+	list := di.FindEdges(a2, b1)
+	if len(list) != 1 {
+		t.Fail()
+	}
+	if !reflect.DeepEqual(list[0], e) {
+		t.Fail()
+	}
+	same := a2.EdgesTo(b1)
+	if !reflect.DeepEqual(list, same) {
+		t.Fail()
 	}
 }
