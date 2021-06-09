@@ -12,3 +12,16 @@ func TestAttributesMap_Attrs(t *testing.T) {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 }
+
+func TestAttributesMap_AttrsMissingValue(t *testing.T) {
+	caught := false
+	defer func() {
+		if r := recover(); r != nil {
+			caught = true
+		}
+	}()
+	NewGraph().Attrs("l", "v", "l2")
+	if !caught {
+		t.Fail()
+	}
+}
