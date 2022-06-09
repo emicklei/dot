@@ -3,8 +3,9 @@ package dot
 // Edge represents a graph edge between two Nodes.
 type Edge struct {
 	AttributesMap
-	graph    *Graph
-	from, to Node
+	graph            *Graph
+	from, to         Node
+	fromPort, toPort string
 }
 
 // Attr sets key=value and returns the Egde.
