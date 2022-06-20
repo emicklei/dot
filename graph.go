@@ -191,10 +191,10 @@ func (g *Graph) EdgeWithPorts(fromNode, toNode Node, fromNodePort, toNodePort st
 		AttributesMap: AttributesMap{attributes: map[string]interface{}{}},
 		graph:         edgeOwner}
 	if fromNodePort != "" {
-		e.fromPort = ":" + fromNodePort
+		e.fromPort = fromNodePort
 	}
 	if toNodePort != "" {
-		e.toPort = ":" + toNodePort
+		e.toPort = toNodePort
 	}
 	if len(labels) > 0 {
 		e.Attr("label", strings.Join(labels, ","))
@@ -273,7 +273,15 @@ func (g Graph) IndentedWrite(w *IndentWriter) {
 		for _, each := range g.sortedEdgesFromKeys() {
 			all := g.edgesFrom[each]
 			for _, each := range all {
-				fmt.Fprintf(w, "n%d%s%sn%d%s", each.from.seq, each.fromPort, denoteEdge, each.to.seq, each.toPort)
+				fromPort := ""
+				if each.fromPort != "" {
+					fromPort = ":" + each.fromPort
+				}
+				toPort := ""
+				if each.toPort != "" {
+					toPort = ":" + each.toPort
+				}
+				fmt.Fprintf(w, "n%d%s%sn%d%s", each.from.seq, fromPort, denoteEdge, each.to.seq, toPort)
 				appendSortedMap(each.attributes, true, w)
 				fmt.Fprint(w, ";")
 				w.NewLine()
