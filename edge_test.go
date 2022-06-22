@@ -41,6 +41,62 @@ func TestEdgeStyleHelpers(t *testing.T) {
 	}
 }
 
+func TestEdgeWithTwoPorts(t *testing.T) {
+	di := NewGraph(Directed)
+	n1 := di.Node("A")
+	n1.Attr("label", HTML("<table><tr><td port='port_a'>A</td></tr></table>"))
+	n2 := di.Node("B")
+	n2.Attr("label", HTML("<table><tr><td port='port_b'>B</td></tr></table>"))
+	di.EdgeWithPorts(n1, n2, "port_a", "port_b")
+
+	want := "digraph  {n1[label=<<table><tr><td port='port_a'>A</td></tr></table>>];n2[label=<<table><tr><td port='port_b'>B</td></tr></table>>];n1:port_a->n2:port_b;}"
+	if got, want := flatten(di.String()), want; got != want {
+		t.Errorf("got [%v] want [%v]", got, want)
+	}
+}
+
+func TestEdgeWithNoPorts(t *testing.T) {
+	di := NewGraph(Directed)
+	n1 := di.Node("A")
+	n1.Attr("label", HTML("<table><tr><td>A</td></tr></table>"))
+	n2 := di.Node("B")
+	n2.Attr("label", HTML("<table><tr><td>B</td></tr></table>"))
+	di.EdgeWithPorts(n1, n2, "", "")
+
+	want := "digraph  {n1[label=<<table><tr><td>A</td></tr></table>>];n2[label=<<table><tr><td>B</td></tr></table>>];n1->n2;}"
+	if got, want := flatten(di.String()), want; got != want {
+		t.Errorf("got [%v] want [%v]", got, want)
+	}
+}
+
+func TestEdgeWithFirstPort(t *testing.T) {
+	di := NewGraph(Directed)
+	n1 := di.Node("A")
+	n1.Attr("label", HTML("<table><tr><td port='port_a'>A</td></tr></table>"))
+	n2 := di.Node("B")
+	n2.Attr("label", HTML("<table><tr><td>B</td></tr></table>"))
+	di.EdgeWithPorts(n1, n2, "port_a", "")
+
+	want := "digraph  {n1[label=<<table><tr><td port='port_a'>A</td></tr></table>>];n2[label=<<table><tr><td>B</td></tr></table>>];n1:port_a->n2;}"
+	if got, want := flatten(di.String()), want; got != want {
+		t.Errorf("got [%v] want [%v]", got, want)
+	}
+}
+
+func TestEdgeWithSecondPort(t *testing.T) {
+	di := NewGraph(Directed)
+	n1 := di.Node("A")
+	n1.Attr("label", HTML("<table><tr><td>A</td></tr></table>"))
+	n2 := di.Node("B")
+	n2.Attr("label", HTML("<table><tr><td port='port_b'>B</td></tr></table>"))
+	di.EdgeWithPorts(n1, n2, "", "port_b")
+
+	want := "digraph  {n1[label=<<table><tr><td>A</td></tr></table>>];n2[label=<<table><tr><td port='port_b'>B</td></tr></table>>];n1->n2:port_b;}"
+	if got, want := flatten(di.String()), want; got != want {
+		t.Errorf("got [%v] want [%v]", got, want)
+	}
+}
+
 func TestEdgeSetLabel(t *testing.T) {
 	di := NewGraph(Directed)
 	n1 := di.Node("A")

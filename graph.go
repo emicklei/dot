@@ -174,6 +174,12 @@ func (g *Graph) DeleteNode(id string) bool {
 // Nodes can be have multiple edges to the same other node (or itself).
 // If one or more labels are given then the "label" attribute is set to the edge.
 func (g *Graph) Edge(fromNode, toNode Node, labels ...string) Edge {
+	return g.EdgeWithPorts(fromNode, toNode, "", "", labels...)
+}
+
+// EdgeWithPorts creates a new edge between two nodes with ports.
+// Other functionality are the same
+func (g *Graph) EdgeWithPorts(fromNode, toNode Node, fromNodePort, toNodePort string, labels ...string) Edge {
 	// assume fromNode owner == toNode owner
 	edgeOwner := g
 	if fromNode.graph != toNode.graph { // 1 or 2 are subgraphs
@@ -184,6 +190,12 @@ func (g *Graph) Edge(fromNode, toNode Node, labels ...string) Edge {
 		to:            toNode,
 		AttributesMap: AttributesMap{attributes: map[string]interface{}{}},
 		graph:         edgeOwner}
+	if fromNodePort != "" {
+		e.fromPort = fromNodePort
+	}
+	if toNodePort != "" {
+		e.toPort = toNodePort
+	}
 	if len(labels) > 0 {
 		e.Attr("label", strings.Join(labels, ","))
 	}
@@ -261,7 +273,15 @@ func (g Graph) IndentedWrite(w *IndentWriter) {
 		for _, each := range g.sortedEdgesFromKeys() {
 			all := g.edgesFrom[each]
 			for _, each := range all {
-				fmt.Fprintf(w, "n%d%sn%d", each.from.seq, denoteEdge, each.to.seq)
+				fromPort := ""
+				if each.fromPort != "" {
+					fromPort = ":" + each.fromPort
+				}
+				toPort := ""
+				if each.toPort != "" {
+					toPort = ":" + each.toPort
+				}
+				fmt.Fprintf(w, "n%d%s%sn%d%s", each.from.seq, fromPort, denoteEdge, each.to.seq, toPort)
 				appendSortedMap(each.attributes, true, w)
 				fmt.Fprint(w, ";")
 				w.NewLine()
