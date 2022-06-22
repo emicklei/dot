@@ -1,5 +1,9 @@
 # Change history of the dot package
 
+## v1.0.0 - 2022-06-22
+
+- add support for port, see https://github.com/emicklei/dot/pull/25 (thx v-electrolux)
+
 ## v0.16.0 - 2021-05-04
 
 - add DeleteNote, see https://github.com/emicklei/dot/pull/24
