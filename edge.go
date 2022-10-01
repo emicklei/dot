@@ -51,3 +51,7 @@ func (e Edge) Edge(to Node, labels ...string) Edge {
 func (e Edge) EdgesTo(to Node) []Edge {
 	return e.graph.FindEdges(e.to, to)
 }
+
+func (e Edge) GetAttr(name string) interface{} {
+	return e.attributes[name]
+}

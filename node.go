@@ -33,3 +33,7 @@ func (n Node) Edge(toNode Node, labels ...string) Edge {
 func (n Node) EdgesTo(toNode Node) []Edge {
 	return n.graph.FindEdges(n, toNode)
 }
+
+func (n Node) GetAttr(name string) interface{} {
+	return n.attributes[name]
+}
