@@ -32,16 +32,22 @@ func Mermaid(g *Graph, orientation int) string {
 	for k, v := range g.edgesFrom {
 		for _, each := range v {
 			sb.WriteString(k)
-			if label := each.from.GetAttr("label"); label != nil {
+			if label := each.from.GetAttr("label"); label != nil && label != each.from.id {
 				fmt.Fprintf(sb, "(%s)", label.(string))
 			}
-			//if g.graphType == Directed TODO
+			link := "-->"
+			if g.graphType == Undirected.Name {
+				link = "---"
+			}
 			if label := each.GetAttr("label"); label != nil {
-				fmt.Fprintf(sb, "-->|%s|", label.(string))
+				fmt.Fprintf(sb, "%s|%s|", link, label.(string))
 			} else {
-				sb.WriteString("-->")
+				sb.WriteString(link)
 			}
 			sb.WriteString(each.to.id)
+			if label := each.to.GetAttr("label"); label != nil && label != each.to.id {
+				fmt.Fprintf(sb, "(%s)", label.(string))
+			}
 			mermaidEnd(sb)
 		}
 	}
