@@ -13,9 +13,34 @@ const (
 	MermaidLeftToRight
 )
 
-func Mermaid(g *Graph, orientation int) string {
+var (
+	MermaidShapeRound        = shape{"(", ")"}
+	MermaidShapeStadium      = shape{"([", "])"}
+	MermaidShapeSubroutine   = shape{"[[", "]]"}
+	MermaidShapeCylinder     = shape{"[(", ")]"}
+	MermaidShapeCirle        = shape{"((", "))"}
+	MermaidShapeAsymmetric   = shape{">", "]"}
+	MermaidShapeRhombus      = shape{"{", "}"}
+	MermaidShapeTrapezoid    = shape{"[/", "\\]"}
+	MermaidShapeTrapezoidAlt = shape{"[\\", "/]"}
+)
+
+type shape struct {
+	open, close string
+}
+
+func MermaidGraph(g *Graph, orientation int) string {
+	return diagram(g, "graph", orientation)
+}
+
+func MermaidFlowchart(g *Graph, orientation int) string {
+	return diagram(g, "flowchart", orientation)
+}
+
+func diagram(g *Graph, diagramType string, orientation int) string {
 	sb := new(strings.Builder)
-	sb.WriteString("graph ")
+	sb.WriteString(diagramType)
+	sb.WriteRune(' ')
 	switch orientation {
 	case MermaidTopDown, MermaidTopToBottom:
 		sb.WriteString("TD")
@@ -28,32 +53,42 @@ func Mermaid(g *Graph, orientation int) string {
 	default:
 		sb.WriteString("TD")
 	}
-	mermaidEnd(sb)
-	for k, v := range g.edgesFrom {
-		for _, each := range v {
-			sb.WriteString(k)
-			if label := each.from.GetAttr("label"); label != nil && label != each.from.id {
-				fmt.Fprintf(sb, "(%s)", label.(string))
-			}
-			link := "-->"
-			if g.graphType == Undirected.Name {
-				link = "---"
-			}
+	writeEnd(sb)
+	// graph nodes
+	for _, key := range g.sortedNodesKeys() {
+		nodeShape := MermaidShapeRound
+		each := g.nodes[key]
+		if s := each.GetAttr("shape"); s != nil {
+			nodeShape = s.(shape)
+		}
+		txt := "?"
+		if label := each.GetAttr("label"); label != nil {
+			txt = label.(string)
+		}
+		fmt.Fprintf(sb, "\tn%d%s%s%s;\n", each.seq, nodeShape.open, txt, nodeShape.close)
+		if style := each.GetAttr("style"); style != nil {
+			fmt.Fprintf(sb, "\tstyle n%d %s\n", each.seq, style.(string))
+		}
+	}
+	// all edges
+	// graph edges
+	denoteEdge := "-->"
+	if g.graphType == "graph" {
+		denoteEdge = "---"
+	}
+	for _, each := range g.sortedEdgesFromKeys() {
+		all := g.edgesFrom[each]
+		for _, each := range all {
 			if label := each.GetAttr("label"); label != nil {
-				fmt.Fprintf(sb, "%s|%s|", link, label.(string))
+				fmt.Fprintf(sb, "\tn%d%s|%s|n%d;\n", each.from.seq, denoteEdge, label.(string), each.to.seq)
 			} else {
-				sb.WriteString(link)
+				fmt.Fprintf(sb, "\tn%d%sn%d;\n", each.from.seq, denoteEdge, each.to.seq)
 			}
-			sb.WriteString(each.to.id)
-			if label := each.to.GetAttr("label"); label != nil && label != each.to.id {
-				fmt.Fprintf(sb, "(%s)", label.(string))
-			}
-			mermaidEnd(sb)
 		}
 	}
 	return sb.String()
 }
 
-func mermaidEnd(sb *strings.Builder) {
+func writeEnd(sb *strings.Builder) {
 	sb.WriteString(";\n")
 }

@@ -47,6 +47,11 @@ func (e Edge) Edge(to Node, labels ...string) Edge {
 	return e.graph.Edge(e.to, to, labels...)
 }
 
+// ReverseEdge returns a new Edge between the "from" node of this Edge and the argument Node.
+func (e Edge) ReverseEdge(from Node, labels ...string) Edge {
+	return e.graph.Edge(from, e.to, labels...)
+}
+
 // EdgesTo returns all existing edges between the "to" Node of the Edge and the argument Node.
 func (e Edge) EdgesTo(to Node) []Edge {
 	return e.graph.FindEdges(e.to, to)
@@ -54,4 +59,12 @@ func (e Edge) EdgesTo(to Node) []Edge {
 
 func (e Edge) GetAttr(name string) interface{} {
 	return e.attributes[name]
+}
+
+func (e Edge) From() Node {
+	return e.from
+}
+
+func (e Edge) To() Node {
+	return e.to
 }

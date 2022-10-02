@@ -375,3 +375,12 @@ func (g Graph) FindNodes() (nodes []Node) {
 	})
 	return foundNodes
 }
+
+func (g Graph) IsDirected() bool {
+	return g.graphType == Directed.Name
+}
+
+// EdgesMap returns a map with Node.id -> []Edge
+func (g Graph) EdgesMap() map[string][]Edge {
+	return g.edgesFrom
+}
