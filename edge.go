@@ -57,14 +57,17 @@ func (e Edge) EdgesTo(to Node) []Edge {
 	return e.graph.FindEdges(e.to, to)
 }
 
+// GetAttr returns the value stored by a name. Returns nil if missing.
 func (e Edge) GetAttr(name string) interface{} {
 	return e.attributes[name]
 }
 
+// From returns the Node that this edge is pointing from.
 func (e Edge) From() Node {
 	return e.from
 }
 
+// To returns the Node that this edge is pointing to.
 func (e Edge) To() Node {
 	return e.to
 }

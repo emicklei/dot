@@ -376,6 +376,7 @@ func (g Graph) FindNodes() (nodes []Node) {
 	return foundNodes
 }
 
+// IsDirected returns info about the graph type
 func (g Graph) IsDirected() bool {
 	return g.graphType == Directed.Name
 }

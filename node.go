@@ -8,6 +8,7 @@ type Node struct {
 	seq   int
 }
 
+// ID returns the assigned id to this node.
 func (n Node) ID() string { return n.id }
 
 // Attr sets label=value and return the Node
@@ -36,6 +37,7 @@ func (n Node) EdgesTo(toNode Node) []Edge {
 	return n.graph.FindEdges(n, toNode)
 }
 
+// GetAttr returns the value stored by a name. Returns nil if missing.
 func (n Node) GetAttr(name string) interface{} {
 	return n.attributes[name]
 }
