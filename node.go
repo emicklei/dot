@@ -8,6 +8,9 @@ type Node struct {
 	seq   int
 }
 
+// ID returns the assigned id to this node.
+func (n Node) ID() string { return n.id }
+
 // Attr sets label=value and return the Node
 func (n Node) Attr(label string, value interface{}) Node {
 	n.AttributesMap.Attr(label, value)
@@ -32,4 +35,14 @@ func (n Node) Edge(toNode Node, labels ...string) Edge {
 // EdgesTo returns all existing edges between this Node and the argument Node.
 func (n Node) EdgesTo(toNode Node) []Edge {
 	return n.graph.FindEdges(n, toNode)
+}
+
+// GetAttr returns the value stored by a name. Returns nil if missing.
+func (n Node) GetAttr(name string) interface{} {
+	return n.attributes[name]
+}
+
+// ReverseEdge sets label=value and returns the Edge for chaining.
+func (n Node) ReverseEdge(fromNode Node, labels ...string) Edge {
+	return n.graph.Edge(fromNode, n, labels...)
 }

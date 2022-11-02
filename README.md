@@ -97,4 +97,9 @@ https://graphviz.gitlab.io/doc/info/attrs.html
 
 	go run main.go | dot -Tpng  > test.png && open test.png
 
+## mermaid
+
+Output a dot Graph using the [mermaid](https://mermaid-js.github.io/mermaid/#/README) syntax.
+Only Graph and Flowchart are supported. See MermaidGraph and MermaidFlowchart.
+
 (c) 2015-2022, http://ernestmicklei.com. MIT License.
