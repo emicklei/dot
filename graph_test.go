@@ -324,3 +324,34 @@ func TestGraphCommonParent(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestReverseEdge(t *testing.T) {
+	di := NewGraph(Directed)
+	if !di.IsDirected() {
+		t.Fail()
+	}
+	a := di.Node("a")
+	b := di.Node("b")
+	e := a.ReverseEdge(b)
+	if got, want := flatten(di.String()), `digraph  {n1[label="a"];n2[label="b"];n2->n1;}`; got != want {
+		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
+	}
+	if got, want := e.From().ID(), b.ID(); got != want {
+		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
+	}
+	if got, want := e.To().id, a.id; got != want {
+		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
+	}
+	m := di.EdgesMap()
+	if got, want := len(m), 1; got != want {
+		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
+	}
+	if got, want := len(m["b"]), 1; got != want {
+		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
+	}
+	c := di.Node("c")
+	e.ReverseEdge(c)
+	if got, want := flatten(di.String()), `digraph  {n1[label="a"];n2[label="b"];n3[label="c"];n2->n1;n3->n1;}`; got != want {
+		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
+	}
+}
