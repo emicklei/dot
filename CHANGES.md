@@ -1,5 +1,9 @@
 # Change history of the dot package
 
+## v1.1.0 - 2022-11-07
+
+- add support for Mermaid graph out.
+
 ## v1.0.0 - 2022-06-22
 
 - add support for port, see https://github.com/emicklei/dot/pull/25 (thx v-electrolux)
