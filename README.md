@@ -42,6 +42,10 @@ Chaining edges
 	
 	A -> B -> C
 
+	g.Node("D").BidirectionalEdge(g.Node("E))
+
+	D <-> E
+
 Subgraphs
 
 	s := g.Subgraph("cluster")
@@ -101,5 +105,11 @@ https://graphviz.gitlab.io/doc/info/attrs.html
 
 Output a dot Graph using the [mermaid](https://mermaid-js.github.io/mermaid/#/README) syntax.
 Only Graph and Flowchart are supported. See MermaidGraph and MermaidFlowchart.
+
+### testing
+
+	go test -coverprofile=coverage.out ./...
+	go tool cover -html=coverage.out
+
 
 (c) 2015-2022, http://ernestmicklei.com. MIT License.

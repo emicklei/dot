@@ -111,3 +111,11 @@ func TestEdgeSetLabel(t *testing.T) {
 		}
 	}
 }
+
+func TestNonStringAttribute(t *testing.T) {
+	di := NewGraph(Directed)
+	di.Node("A").Attr("shoesize", 42)
+	if got, want := flatten(di.String()), `digraph  {n1[label="A",shoesize="42"];}`; got != want {
+		t.Errorf("got [%v] want [%v]", got, want)
+	}
+}

@@ -46,3 +46,10 @@ func (n Node) GetAttr(name string) interface{} {
 func (n Node) ReverseEdge(fromNode Node, labels ...string) Edge {
 	return n.graph.Edge(fromNode, n, labels...)
 }
+
+// BidirectionalEdge adds two edges, marks the first as invisible and the second with direction "both". Returns both edges.
+func (n Node) BidirectionalEdge(toAndFromNode Node) []Edge {
+	e1 := n.Edge(toAndFromNode).Attr("style", "invis")
+	e2 := toAndFromNode.Edge(n).Attr("dir", "both")
+	return []Edge{e1, e2}
+}

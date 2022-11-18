@@ -327,8 +327,10 @@ func appendSortedMap(m map[string]interface{}, mustBracket bool, b io.Writer) {
 			fmt.Fprintf(b, "%s=<%s>", k, html)
 		} else if literal, isLiteral := m[k].(Literal); isLiteral {
 			fmt.Fprintf(b, "%s=%s", k, literal)
+		} else if str, ok := m[k].(string); ok {
+			fmt.Fprintf(b, "%s=%q", k, str)
 		} else {
-			fmt.Fprintf(b, "%s=%q", k, m[k])
+			fmt.Fprintf(b, "%s=\"%v\"", k, m[k])
 		}
 		first = false
 	}
