@@ -42,14 +42,14 @@ Chaining edges
 	
 	A -> B -> C
 
-	g.Node("D").BidirectionalEdge(g.Node("E))
+	g.Node("D").BidirectionalEdge(g.Node("E"))
 
 	D <-> E
 
 Subgraphs
 
 	s := g.Subgraph("cluster")
-	s.Attr("style","filled")
+	s.Attr("style", "filled")
 
 
 Initializers
