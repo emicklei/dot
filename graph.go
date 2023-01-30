@@ -67,6 +67,22 @@ func (g *Graph) Root() *Graph {
 	return g.parent.Root()
 }
 
+func (g *Graph) FindNodeWithLabel(label string) (Node, bool) {
+	for _, each := range g.nodes {
+		if eachLabel, ok := each.attributes["label"]; ok {
+			if eachLabel == label {
+				return each, true
+			}
+		}
+	}
+	// TODO search subgraphs too?
+	if g.parent == nil {
+		return Node{id: "void"}, false
+	}
+	return g.parent.FindNodeWithLabel(label)
+
+}
+
 // FindSubgraph returns the subgraph of the graph or one from its parents.
 func (g *Graph) FindSubgraph(id string) (*Graph, bool) {
 	sub, ok := g.subgraphs[id]

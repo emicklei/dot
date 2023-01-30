@@ -355,3 +355,32 @@ func TestReverseEdge(t *testing.T) {
 		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
 	}
 }
+
+func TestFindNodeWithLabel(t *testing.T) {
+	di := NewGraph(Directed)
+	di.Node("A")
+	di.Node("B")
+	sub := di.Subgraph("new subgraph")
+	sub.Node("C")
+
+	n1, ok := di.FindNodeWithLabel("B")
+	if !ok {
+		t.Fail()
+	}
+	if l := n1.GetAttr("label"); l != "B" {
+		t.Fail()
+	}
+
+	n2, ok := sub.FindNodeWithLabel("A")
+	if !ok {
+		t.Fail()
+	}
+	if l := n2.GetAttr("label"); l != "A" {
+		t.Fail()
+	}
+
+	_, ok = sub.FindNodeWithLabel("D")
+	if ok {
+		t.Fail()
+	}
+}
