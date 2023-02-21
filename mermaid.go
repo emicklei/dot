@@ -2,6 +2,7 @@ package dot
 
 import (
 	"fmt"
+	"html"
 	"strings"
 )
 
@@ -37,6 +38,10 @@ func MermaidFlowchart(g *Graph, orientation int) string {
 	return diagram(g, "flowchart", orientation)
 }
 
+func escape(value string) string {
+	return fmt.Sprintf(`"%s"`, html.EscapeString(value))
+}
+
 func diagram(g *Graph, diagramType string, orientation int) string {
 	sb := new(strings.Builder)
 	sb.WriteString(diagramType)
@@ -65,7 +70,7 @@ func diagram(g *Graph, diagramType string, orientation int) string {
 		if label := each.GetAttr("label"); label != nil {
 			txt = label.(string)
 		}
-		fmt.Fprintf(sb, "\tn%d%s%s%s;\n", each.seq, nodeShape.open, txt, nodeShape.close)
+		fmt.Fprintf(sb, "\tn%d%s%s%s;\n", each.seq, nodeShape.open, escape(txt), nodeShape.close)
 		if style := each.GetAttr("style"); style != nil {
 			fmt.Fprintf(sb, "\tstyle n%d %s\n", each.seq, style.(string))
 		}
@@ -80,7 +85,7 @@ func diagram(g *Graph, diagramType string, orientation int) string {
 		all := g.edgesFrom[each]
 		for _, each := range all {
 			if label := each.GetAttr("label"); label != nil {
-				fmt.Fprintf(sb, "\tn%d%s|%s|n%d;\n", each.from.seq, denoteEdge, label.(string), each.to.seq)
+				fmt.Fprintf(sb, "\tn%d%s|%s|n%d;\n", each.from.seq, denoteEdge, escape(label.(string)), each.to.seq)
 			} else {
 				fmt.Fprintf(sb, "\tn%d%sn%d;\n", each.from.seq, denoteEdge, each.to.seq)
 			}
