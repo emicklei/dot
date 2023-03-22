@@ -8,7 +8,7 @@ The `Subsystem` type can be used to create abstraction hierarchies like but not 
 
 Let's examine this diagram.
 
-![](./TestExampleSubsystemSameGraph.png)
+![](../doc/TestExampleSubsystemSameGraph.png)
 
 On the most right, you find a node called `subsystem` which is a Subsystem with 2 inputs and 1 output edge.
 
@@ -22,4 +22,6 @@ So, `subsystem` is a composition of 3 components and 1 of these components is it
 
 If you create a Subsystem using the `ExternalGraph` kind then its graph can be exported separatedly from the containing graph. If you visualize such a graph using `SVG` then you can **nagivate into** the subsystems.
 
-![](./TestExampleSubsystemExternalGraph.svg)
+![](../doc/TestExampleSubsystemExternalGraph.svg)
+
+See `subsystem_test.go` for the code of these examples.
