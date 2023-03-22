@@ -1,4 +1,7 @@
 /*.dot
+/ext/*.dot
+/ext/*.svg
+/ext/*.png
 /*.png
 .idea
 coverage.out
