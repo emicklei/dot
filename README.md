@@ -93,6 +93,8 @@ HTML and Literal values
 	// edges
 	outside.Edge(insideFour).Edge(insideOne).Edge(insideTwo).Edge(insideThree).Edge(outside)
 
+See also `ext/Subsystem` type for creating composition hierchies.
+
 ## About dot attributes
 
 https://graphviz.gitlab.io/doc/info/attrs.html
@@ -112,9 +114,13 @@ g := dot.NewGraph(dot.Directed)
 fmt.Println(dot.MermaidGraph(g, dot.MermaidTopToBottom))
 ```
 
+## extensions
+
+See also package `dot/ext` for types that may help in constructing complex graphs.
+
 ### testing
 
 	go test -coverprofile=coverage.out ./...
 	go tool cover -html=coverage.out
 
-(c) 2015-2022, http://ernestmicklei.com. MIT License.
+(c) 2015-2023, http://ernestmicklei.com. MIT License.

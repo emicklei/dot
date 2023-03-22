@@ -24,11 +24,11 @@ If you create a Subsystem using the `ExternalGraph` kind then its graph can be e
 
 ![](../doc/TestExampleSubsystemExternalGraph.svg)
 
-And clicking on `subsystem`, you browse will show:
+And clicking on `subsystem`, your browse will show:
 
 ![](../doc/subsystem.svg)
 
-And clicking on `subsystem2`, you browse will show:
+And clicking on `subsystem2`, your browse will show:
 
 ![](../doc/subsystem2.svg)
 
