@@ -1,6 +1,7 @@
 package dotx
 
 import (
+	"log"
 	"os"
 	"strings"
 
@@ -47,7 +48,7 @@ func (s *Subsystem) Attr(label string, value interface{}) dot.Node {
 	return s.outerNode.Attr(label, value)
 }
 
-// This name will be used for the .dot export and the HREF link using svg
+// ExportName argument name will be used for the .dot export and the HREF link using svg
 // So if name = "my example" then export will create "my_example.dot" and the link will be "my_example.svg"
 func (s *Subsystem) ExportName(name string) {
 	href := strings.ReplaceAll(name, " ", "_") + ".svg"
@@ -90,7 +91,18 @@ func (s *Subsystem) connect(portName string, isInput bool, inner dot.Node) dot.E
 	}
 }
 
-// ExportFile creates a DOT file using the default name (based on name) or set using ExportName.
+// ExportFile creates a DOT file using the default name (based on name) or overridden using ExportName().
 func (s *Subsystem) ExportFile() error {
 	return os.WriteFile(s.dotFilename, []byte(s.Graph.String()), os.ModePerm)
+}
+
+// Export writes the DOT file for a Subsystem after building the content (child) graph using the build function.
+// Use ExportName() on the Subsystem to modify the filename used.
+// If writing of the file fails then a warning is logged.
+func (s *Subsystem) Export(build func(g *dot.Graph)) *Subsystem {
+	build(s.Graph)
+	if err := s.ExportFile(); err != nil {
+		log.Println("WARN: dotx.Subsystem.Export failed", err)
+	}
+	return s
 }
