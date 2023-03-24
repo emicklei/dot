@@ -1,6 +1,7 @@
 package dotx
 
 import (
+	"errors"
 	"log"
 	"os"
 	"strings"
@@ -23,6 +24,7 @@ type Subsystem struct {
 	outerNode   dot.Node
 	outerGraph  *dot.Graph
 	dotFilename string
+	kind        subsystemKind
 }
 
 // NewSubsystem creates a Subsystem abstraction that is represented as a Node (box3d shape) in the graph.
@@ -38,6 +40,7 @@ func NewSubsystem(id string, g *dot.Graph, kind subsystemKind) *Subsystem {
 		Graph:      innerGraph,
 		outerNode:  g.Node(id).Attr("shape", "box3d"),
 		outerGraph: g,
+		kind:       kind,
 	}
 	sub.ExportName(id)
 	return sub
@@ -93,6 +96,9 @@ func (s *Subsystem) connect(portName string, isInput bool, inner dot.Node) dot.E
 
 // ExportFile creates a DOT file using the default name (based on name) or overridden using ExportName().
 func (s *Subsystem) ExportFile() error {
+	if s.kind != ExternalGraph {
+		return errors.New("ExportFile is only applicable to a ExternalGraph Subsystem")
+	}
 	return os.WriteFile(s.dotFilename, []byte(s.Graph.String()), os.ModePerm)
 }
 
