@@ -1,4 +1,4 @@
-## dot/ext package
+## dotx package (dto)
 
 This package contains utilities to create graphs on top of the `emicklei/dot package`.
 
@@ -33,3 +33,17 @@ And clicking on `subsystem2`, your browse will show:
 ![](../doc/subsystem2.svg)
 
 See `subsystem_test.go` for the code of these examples.
+
+### usage pattern
+
+    import dotx "github.com/emicklei/dot/dotx"
+
+    func YourService(parent *dot.Graph) *dotx.Subsystem {
+        sub := dotx.NewSubsystem("Your Service", parent, dotx.ExternalGraph)
+
+        myComp := sub.Graph.Node("myComp")
+        sub.Input("in",myComp)
+
+        sub.ExportFile()
+        return sub
+    }

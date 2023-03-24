@@ -1,7 +1,8 @@
-package ext
+package dotx
 
 import (
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/emicklei/dot"
@@ -60,8 +61,17 @@ func TestExampleSubsystemExternalGraph(t *testing.T) {
 	sub3 := sub2.Node("subcomponent 3")
 	sub2.Input("in3", sub3)
 
+	// because External, we need to export both subsystems
 	sub.ExportFile()
 	sub2.ExportFile()
 
 	os.WriteFile("TestExampleSubsystemExternalGraph.dot", []byte(g.String()), os.ModePerm)
+}
+
+func TestAttrOnSubsystem(t *testing.T) {
+	s := NewSubsystem("test", dot.NewGraph(), SameGraph)
+	s.Attr("shape", "box3d")
+	if !strings.Contains(s.String(), "test") { // dont care about structure, dot has tested that
+		t.Fail()
+	}
 }
