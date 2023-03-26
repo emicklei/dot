@@ -116,7 +116,9 @@ fmt.Println(dot.MermaidGraph(g, dot.MermaidTopToBottom))
 
 ## extensions
 
-See also package `dot/ext` for types that may help in constructing complex graphs.
+See also package `dot/dotx` for types that can help in constructing complex graphs.
+
+![](./doc/TestExampleSubsystemSameGraph.png)
 
 ### testing
 

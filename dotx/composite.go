@@ -9,34 +9,34 @@ import (
 	"github.com/emicklei/dot"
 )
 
-type subsystemKind int
+type compositeGraphKind int
 
 const (
 	// SameGraph means that the subsystem graph will be a cluster within the graph.
-	SameGraph subsystemKind = iota
+	SameGraph compositeGraphKind = iota
 	// ExternalGraph means the the subsystem graph will be exported on its own, linked by the node within the graph
 	ExternalGraph
 )
 
-// Subsystem is a graph and node to create abstractions in graphs.
-type Subsystem struct {
+// Composite is a graph and node to create abstractions in graphs.
+type Composite struct {
 	*dot.Graph
 	outerNode   dot.Node
 	outerGraph  *dot.Graph
 	dotFilename string
-	kind        subsystemKind
+	kind        compositeGraphKind
 }
 
-// NewSubsystem creates a Subsystem abstraction that is represented as a Node (box3d shape) in the graph.
+// NewComposite creates a Composite abstraction that is represented as a Node (box3d shape) in the graph.
 // The kind determines whether the graph of the subsystem is embedded (same graph) or external.
-func NewSubsystem(id string, g *dot.Graph, kind subsystemKind) *Subsystem {
+func NewComposite(id string, g *dot.Graph, kind compositeGraphKind) *Composite {
 	var innerGraph *dot.Graph
 	if kind == SameGraph {
 		innerGraph = g.Subgraph(id, dot.ClusterOption{})
 	} else {
 		innerGraph = dot.NewGraph(dot.Directed)
 	}
-	sub := &Subsystem{
+	sub := &Composite{
 		Graph:      innerGraph,
 		outerNode:  g.Node(id).Attr("shape", "box3d"),
 		outerGraph: g,
@@ -47,13 +47,13 @@ func NewSubsystem(id string, g *dot.Graph, kind subsystemKind) *Subsystem {
 }
 
 // Attr sets label=value and returns the Node in the graph
-func (s *Subsystem) Attr(label string, value interface{}) dot.Node {
+func (s *Composite) Attr(label string, value interface{}) dot.Node {
 	return s.outerNode.Attr(label, value)
 }
 
 // ExportName argument name will be used for the .dot export and the HREF link using svg
 // So if name = "my example" then export will create "my_example.dot" and the link will be "my_example.svg"
-func (s *Subsystem) ExportName(name string) {
+func (s *Composite) ExportName(name string) {
 	href := strings.ReplaceAll(name, " ", "_") + ".svg"
 	dot := strings.ReplaceAll(name, " ", "_") + ".dot"
 	s.outerNode.Attr("href", href)
@@ -63,7 +63,7 @@ func (s *Subsystem) ExportName(name string) {
 // Input creates an edge.
 // If the from Node is part of the parent graph then the edge is added to the parent graph.
 // If the from Node is part of the subsystem then the edge is added to the inner graph.
-func (s *Subsystem) Input(id string, from dot.Node) dot.Edge {
+func (s *Composite) Input(id string, from dot.Node) dot.Edge {
 	if _, ok := s.FindNodeById(from.ID()); ok {
 		// edge on innergraph
 		return s.connect(id, true, from)
@@ -75,7 +75,7 @@ func (s *Subsystem) Input(id string, from dot.Node) dot.Edge {
 // Output creates an edge.
 // If the to Node is part of the parent graph then the edge is added to the parent graph.
 // If the to Node is part of the subsystem then the edge is added to the inner graph.
-func (s *Subsystem) Output(id string, to dot.Node) dot.Edge {
+func (s *Composite) Output(id string, to dot.Node) dot.Edge {
 	if _, ok := s.FindNodeById(to.ID()); ok {
 		// edge on innergraph
 		return s.connect(id, false, to)
@@ -84,7 +84,7 @@ func (s *Subsystem) Output(id string, to dot.Node) dot.Edge {
 	return s.outerNode.Edge(to).Label(id)
 }
 
-func (s *Subsystem) connect(portName string, isInput bool, inner dot.Node) dot.Edge {
+func (s *Composite) connect(portName string, isInput bool, inner dot.Node) dot.Edge {
 	port := s.Node(portName).Attr("shape", "point")
 	if isInput {
 		return s.EdgeWithPorts(port, inner, "s", "n").Attr("taillabel", portName)
@@ -95,20 +95,20 @@ func (s *Subsystem) connect(portName string, isInput bool, inner dot.Node) dot.E
 }
 
 // ExportFile creates a DOT file using the default name (based on name) or overridden using ExportName().
-func (s *Subsystem) ExportFile() error {
+func (s *Composite) ExportFile() error {
 	if s.kind != ExternalGraph {
-		return errors.New("ExportFile is only applicable to a ExternalGraph Subsystem")
+		return errors.New("ExportFile is only applicable to a ExternalGraph Composite")
 	}
 	return os.WriteFile(s.dotFilename, []byte(s.Graph.String()), os.ModePerm)
 }
 
-// Export writes the DOT file for a Subsystem after building the content (child) graph using the build function.
-// Use ExportName() on the Subsystem to modify the filename used.
+// Export writes the DOT file for a Composite after building the content (child) graph using the build function.
+// Use ExportName() on the Composite to modify the filename used.
 // If writing of the file fails then a warning is logged.
-func (s *Subsystem) Export(build func(g *dot.Graph)) *Subsystem {
+func (s *Composite) Export(build func(g *dot.Graph)) *Composite {
 	build(s.Graph)
 	if err := s.ExportFile(); err != nil {
-		log.Println("WARN: dotx.Subsystem.Export failed", err)
+		log.Println("WARN: dotx.Composite.Export failed", err)
 	}
 	return s
 }

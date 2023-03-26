@@ -13,7 +13,7 @@ func TestExampleSubsystemSameGraph(t *testing.T) {
 
 	c1 := g.Node("component")
 
-	sub := NewSubsystem("subsystem", g, SameGraph)
+	sub := NewComposite("subsystem", g, SameGraph)
 	sub.Input("in1", c1)
 	sub.Input("in2", c1)
 	sub.Output("out2", c1)
@@ -26,7 +26,7 @@ func TestExampleSubsystemSameGraph(t *testing.T) {
 
 	sc1.Edge(sc2)
 
-	sub2 := NewSubsystem("subsystem2", sub.Graph, SameGraph)
+	sub2 := NewComposite("subsystem2", sub.Graph, SameGraph)
 	sub2.Input("in3", sc1)
 	sub2.Output("out3", sc2)
 
@@ -41,7 +41,7 @@ func TestExampleSubsystemExternalGraph(t *testing.T) {
 
 	c1 := g.Node("component")
 
-	sub := NewSubsystem("subsystem", g, ExternalGraph)
+	sub := NewComposite("subsystem", g, ExternalGraph)
 	sub.Input("in1", c1)
 	sub.Input("in2", c1)
 	sub.Output("out2", c1)
@@ -54,7 +54,7 @@ func TestExampleSubsystemExternalGraph(t *testing.T) {
 		sub.Output("out2", sc2)
 		sc1.Edge(sc2)
 
-		sub2 := NewSubsystem("subsystem2", sub.Graph, ExternalGraph)
+		sub2 := NewComposite("subsystem2", sub.Graph, ExternalGraph)
 		sub2.Export(func(g *dot.Graph) {
 			sub2.Input("in3", sc1)
 			sub2.Output("out3", sc2)
@@ -67,7 +67,7 @@ func TestExampleSubsystemExternalGraph(t *testing.T) {
 }
 
 func TestAttrOnSubsystem(t *testing.T) {
-	s := NewSubsystem("test", dot.NewGraph(), SameGraph)
+	s := NewComposite("test", dot.NewGraph(), SameGraph)
 	s.Attr("shape", "box3d")
 	if !strings.Contains(s.String(), "test") { // dont care about structure, dot has tested that
 		t.Fail()
@@ -75,6 +75,6 @@ func TestAttrOnSubsystem(t *testing.T) {
 }
 
 func TestWarninOnExport(t *testing.T) {
-	s := NewSubsystem("/////fail", dot.NewGraph(), SameGraph)
+	s := NewComposite("/////fail", dot.NewGraph(), SameGraph)
 	s.Export(func(g *dot.Graph) {})
 }
