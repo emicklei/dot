@@ -12,9 +12,9 @@ import (
 type compositeGraphKind int
 
 const (
-	// SameGraph means that the subsystem graph will be a cluster within the graph.
+	// SameGraph means that the composite graph will be a cluster within the graph.
 	SameGraph compositeGraphKind = iota
-	// ExternalGraph means the the subsystem graph will be exported on its own, linked by the node within the graph
+	// ExternalGraph means the the composite graph will be exported on its own, linked by the node within the graph
 	ExternalGraph
 )
 
@@ -28,7 +28,7 @@ type Composite struct {
 }
 
 // NewComposite creates a Composite abstraction that is represented as a Node (box3d shape) in the graph.
-// The kind determines whether the graph of the subsystem is embedded (same graph) or external.
+// The kind determines whether the graph of the composite is embedded (same graph) or external.
 func NewComposite(id string, g *dot.Graph, kind compositeGraphKind) *Composite {
 	var innerGraph *dot.Graph
 	if kind == SameGraph {
@@ -62,7 +62,7 @@ func (s *Composite) ExportName(name string) {
 
 // Input creates an edge.
 // If the from Node is part of the parent graph then the edge is added to the parent graph.
-// If the from Node is part of the subsystem then the edge is added to the inner graph.
+// If the from Node is part of the composite then the edge is added to the inner graph.
 func (s *Composite) Input(id string, from dot.Node) dot.Edge {
 	if _, ok := s.FindNodeById(from.ID()); ok {
 		// edge on innergraph
@@ -74,7 +74,7 @@ func (s *Composite) Input(id string, from dot.Node) dot.Edge {
 
 // Output creates an edge.
 // If the to Node is part of the parent graph then the edge is added to the parent graph.
-// If the to Node is part of the subsystem then the edge is added to the inner graph.
+// If the to Node is part of the composite then the edge is added to the inner graph.
 func (s *Composite) Output(id string, to dot.Node) dot.Edge {
 	if _, ok := s.FindNodeById(to.ID()); ok {
 		// edge on innergraph
