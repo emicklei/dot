@@ -78,3 +78,14 @@ func TestWarninOnExport(t *testing.T) {
 	s := NewComposite("/////fail", dot.NewGraph(), SameGraph)
 	s.Export(func(g *dot.Graph) {})
 }
+
+func TestCompositeWithUnusedIOSameGraph(t *testing.T) {
+	g := dot.NewGraph(dot.Directed)
+
+	c1 := g.Node("component")
+	sub := NewComposite("subsystem", g, SameGraph)
+	sub.Input("in", c1)
+	sub.Output("out", c1)
+
+	os.WriteFile("TestCompositeWithUnusedIOSameGraph.dot", []byte(g.String()), os.ModePerm)
+}
