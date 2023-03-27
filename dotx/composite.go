@@ -68,6 +68,8 @@ func (s *Composite) Input(id string, from dot.Node) dot.Edge {
 		// edge on innergraph
 		return s.connect(id, true, from)
 	}
+	// ensure input node in innergraph
+	s.Node(id).Attr("shape", "point")
 	// edge on outergraph
 	return from.Edge(s.outerNode).Label(id)
 }
@@ -80,11 +82,14 @@ func (s *Composite) Output(id string, to dot.Node) dot.Edge {
 		// edge on innergraph
 		return s.connect(id, false, to)
 	}
+	// ensure output node in innergraph
+	s.Node(id).Attr("shape", "point")
 	// edge on outergraph
 	return s.outerNode.Edge(to).Label(id)
 }
 
 func (s *Composite) connect(portName string, isInput bool, inner dot.Node) dot.Edge {
+	// node creation is idempotent
 	port := s.Node(portName).Attr("shape", "point")
 	if isInput {
 		return s.EdgeWithPorts(port, inner, "s", "n").Attr("taillabel", portName)
