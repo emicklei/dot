@@ -251,18 +251,18 @@ func (g *Graph) AddToSameRank(group string, nodes ...Node) {
 }
 
 // String returns the source in dot notation.
-func (g Graph) String() string {
+func (g *Graph) String() string {
 	b := new(bytes.Buffer)
 	g.Write(b)
 	return b.String()
 }
 
-func (g Graph) Write(w io.Writer) {
+func (g *Graph) Write(w io.Writer) {
 	g.IndentedWrite(NewIndentWriter(w))
 }
 
 // IndentedWrite write the graph to a writer using simple TAB indentation.
-func (g Graph) IndentedWrite(w *IndentWriter) {
+func (g *Graph) IndentedWrite(w *IndentWriter) {
 	fmt.Fprintf(w, "%s %s {", g.graphType, g.id)
 	w.NewLineIndentWhile(func() {
 		// subgraphs
@@ -358,7 +358,7 @@ func appendSortedMap(m map[string]interface{}, mustBracket bool, b io.Writer) {
 }
 
 // VisitNodes visits all nodes recursively
-func (g Graph) VisitNodes(callback func(node Node) (done bool)) {
+func (g *Graph) VisitNodes(callback func(node Node) (done bool)) {
 	for _, node := range g.nodes {
 		done := callback(node)
 		if done {
@@ -372,7 +372,7 @@ func (g Graph) VisitNodes(callback func(node Node) (done bool)) {
 }
 
 // FindNodeById return node by id
-func (g Graph) FindNodeById(id string) (foundNode Node, found bool) {
+func (g *Graph) FindNodeById(id string) (foundNode Node, found bool) {
 	g.VisitNodes(func(node Node) (done bool) {
 		if node.id == id {
 			found = true
@@ -385,7 +385,7 @@ func (g Graph) FindNodeById(id string) (foundNode Node, found bool) {
 }
 
 // FindNodes returns all nodes recursively
-func (g Graph) FindNodes() (nodes []Node) {
+func (g *Graph) FindNodes() (nodes []Node) {
 	var foundNodes []Node
 	g.VisitNodes(func(node Node) (done bool) {
 		foundNodes = append(foundNodes, node)
@@ -395,11 +395,16 @@ func (g Graph) FindNodes() (nodes []Node) {
 }
 
 // IsDirected returns info about the graph type
-func (g Graph) IsDirected() bool {
+func (g *Graph) IsDirected() bool {
 	return g.graphType == Directed.Name
 }
 
 // EdgesMap returns a map with Node.id -> []Edge
-func (g Graph) EdgesMap() map[string][]Edge {
+func (g *Graph) EdgesMap() map[string][]Edge {
 	return g.edgesFrom
+}
+
+// HasNode returns whether the node was created in this graph (does not look for it in subgraphs).
+func (g *Graph) HasNode(n Node) bool {
+	return g == n.graph
 }

@@ -64,7 +64,7 @@ func (s *Composite) ExportName(name string) {
 // If the from Node is part of the parent graph then the edge is added to the parent graph.
 // If the from Node is part of the composite then the edge is added to the inner graph.
 func (s *Composite) Input(id string, from dot.Node) dot.Edge {
-	if _, ok := s.FindNodeById(from.ID()); ok {
+	if s.Graph.HasNode(from) {
 		// edge on innergraph
 		return s.connect(id, true, from)
 	}
@@ -76,7 +76,7 @@ func (s *Composite) Input(id string, from dot.Node) dot.Edge {
 // If the to Node is part of the parent graph then the edge is added to the parent graph.
 // If the to Node is part of the composite then the edge is added to the inner graph.
 func (s *Composite) Output(id string, to dot.Node) dot.Edge {
-	if _, ok := s.FindNodeById(to.ID()); ok {
+	if s.Graph.HasNode(to) {
 		// edge on innergraph
 		return s.connect(id, false, to)
 	}
