@@ -1,5 +1,18 @@
 # Change history of the dot package
 
+## v1.4.0 - 2023-03-28
+
+- add Composite extension
+
+## v1.3.0 - 2023-02-21
+
+- Escape/quote mermaid
+- add FindNodeWithLabel 
+
+## v1.2.0 - 2022-11-18
+
+- add BidirectionalEdge #28
+
 ## v1.1.0 - 2022-11-07
 
 - add support for Mermaid graph out.
