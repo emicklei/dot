@@ -46,6 +46,11 @@ func NewComposite(id string, g *dot.Graph, kind compositeGraphKind) *Composite {
 	return sub
 }
 
+// ExportFilename returns the name of the file used by ExportFile. Override it using ExportName.
+func (s *Composite) ExportFilename() string {
+	return s.dotFilename
+}
+
 // Attr sets label=value and returns the Node in the graph
 func (s *Composite) Attr(label string, value interface{}) dot.Node {
 	return s.outerNode.Attr(label, value)
@@ -104,7 +109,7 @@ func (s *Composite) ExportFile() error {
 	if s.kind != ExternalGraph {
 		return errors.New("ExportFile is only applicable to a ExternalGraph Composite")
 	}
-	return os.WriteFile(s.dotFilename, []byte(s.Graph.String()), os.ModePerm)
+	return os.WriteFile(s.ExportFilename(), []byte(s.Graph.String()), os.ModePerm)
 }
 
 // Export writes the DOT file for a Composite after building the content (child) graph using the build function.
