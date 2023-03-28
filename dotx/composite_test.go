@@ -89,3 +89,17 @@ func TestCompositeWithUnusedIOSameGraph(t *testing.T) {
 
 	os.WriteFile("TestCompositeWithUnusedIOSameGraph.dot", []byte(g.String()), os.ModePerm)
 }
+
+func TestConnectToComposites(t *testing.T) {
+	g := dot.NewGraph()
+	c1 := NewComposite("c1", g, SameGraph)
+	c2 := NewComposite("c2", g, SameGraph)
+	e := c1.Input("in", c2)
+	if e.From().ID() != c2.outerNode.ID() {
+		t.Fail()
+	}
+	f := c1.Output("out", c2)
+	if f.To().ID() != c2.outerNode.ID() {
+		t.Fail()
+	}
+}

@@ -11,6 +11,11 @@ import (
 
 type compositeGraphKind int
 
+// Connectable is a dot.Node or a *dotx.Composite
+type Connectable interface {
+	Attr(label string, value interface{}) dot.Node
+}
+
 const (
 	// SameGraph means that the composite graph will be a cluster within the graph.
 	SameGraph compositeGraphKind = iota
@@ -66,31 +71,47 @@ func (s *Composite) ExportName(name string) {
 }
 
 // Input creates an edge.
-// If the from Node is part of the parent graph then the edge is added to the parent graph.
-// If the from Node is part of the composite then the edge is added to the inner graph.
-func (s *Composite) Input(id string, from dot.Node) dot.Edge {
-	if s.Graph.HasNode(from) {
+// If the from Connectable is part of the parent graph then the edge is added to the parent graph.
+// If the from Connectable is part of the composite then the edge is added to the inner graph.
+func (s *Composite) Input(id string, from Connectable) dot.Edge {
+	var fromNode dot.Node
+	if n, ok := from.(dot.Node); ok {
+		fromNode = n
+	} else {
+		if c, ok := from.(*Composite); ok {
+			fromNode = c.outerNode
+		}
+	}
+	if s.Graph.HasNode(fromNode) {
 		// edge on innergraph
-		return s.connect(id, true, from)
+		return s.connect(id, true, fromNode)
 	}
 	// ensure input node in innergraph
 	s.Node(id).Attr("shape", "point")
 	// edge on outergraph
-	return from.Edge(s.outerNode).Label(id)
+	return fromNode.Edge(s.outerNode).Label(id)
 }
 
 // Output creates an edge.
-// If the to Node is part of the parent graph then the edge is added to the parent graph.
-// If the to Node is part of the composite then the edge is added to the inner graph.
-func (s *Composite) Output(id string, to dot.Node) dot.Edge {
-	if s.Graph.HasNode(to) {
+// If the to Connectable is part of the parent graph then the edge is added to the parent graph.
+// If the to Connectable is part of the composite then the edge is added to the inner graph.
+func (s *Composite) Output(id string, to Connectable) dot.Edge {
+	var toNode dot.Node
+	if n, ok := to.(dot.Node); ok {
+		toNode = n
+	} else {
+		if c, ok := to.(*Composite); ok {
+			toNode = c.outerNode
+		}
+	}
+	if s.Graph.HasNode(toNode) {
 		// edge on innergraph
-		return s.connect(id, false, to)
+		return s.connect(id, false, toNode)
 	}
 	// ensure output node in innergraph
 	s.Node(id).Attr("shape", "point")
 	// edge on outergraph
-	return s.outerNode.Edge(to).Label(id)
+	return s.outerNode.Edge(toNode).Label(id)
 }
 
 func (s *Composite) connect(portName string, isInput bool, inner dot.Node) dot.Edge {
