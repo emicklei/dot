@@ -90,6 +90,9 @@ func TestTwoConnectedNodes(t *testing.T) {
 	di := NewGraph(Directed)
 	n1 := di.Node("A")
 	n2 := di.Node("B")
+	if !di.HasNode(n1) {
+		t.Fail()
+	}
 	di.Edge(n1, n2)
 	if got, want := flatten(di.String()), `digraph  {n1[label="A"];n2[label="B"];n1->n2;}`; got != want {
 		t.Errorf("got [%v] want [%v]", got, want)
