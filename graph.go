@@ -40,6 +40,11 @@ func NewGraph(options ...GraphOption) *Graph {
 	return graph
 }
 
+// GetID returns the identifier of the graph.
+func (g *Graph) GetID() string {
+	return g.id
+}
+
 // ID sets the identifier of the graph.
 func (g *Graph) ID(newID string) *Graph {
 	if len(g.id) > 0 {

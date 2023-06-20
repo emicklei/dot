@@ -53,7 +53,7 @@ func TestMermaidShapes(t *testing.T) {
 	di.Node("trap").Attr("shape", MermaidShapeTrapezoid)
 	di.Node("trapalt").Attr("shape", MermaidShapeTrapezoidAlt)
 	s := MermaidGraph(di, MermaidLeftToRight)
-	t.Log(s)
+	// t.Log(s)
 	if got, want := flatten(s), `graph LR;n2>"asym"];n3(("circ"));n4[("cyl")];n5{"rhom"};n1("round");n6(["stad"]);n7[["sub"]];n8[/"trap"\];n9[\"trapalt"/];`; got != want {
 		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
 	}
@@ -63,7 +63,7 @@ func TestUndirectedMermaid(t *testing.T) {
 	un := NewGraph(Undirected)
 	un.Node("love").Edge(un.Node("happinez"))
 	s := MermaidFlowchart(un, MermaidLeftToRight)
-	t.Log(s)
+	//t.Log(s)
 	if got, want := flatten(s), `flowchart LR;n2("happinez");n1("love");n1---n2;`; got != want {
 		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
 	}

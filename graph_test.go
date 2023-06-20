@@ -24,6 +24,9 @@ func TestOverrideID(t *testing.T) {
 	}()
 	di := NewGraph(Directed)
 	di.ID("one")
+	if got, want := di.GetID(), "one"; got != want {
+		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
+	}
 	di.ID("two")
 	if !caught {
 		t.Fail()
