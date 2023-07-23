@@ -7,7 +7,7 @@ import (
 
 type RecordBuilder struct {
 	target       Node
-	level        int
+	shape        string
 	nesting      *stack
 	currentLabel recordLabel
 }
@@ -15,7 +15,7 @@ type RecordBuilder struct {
 func NewRecordBuilder(n Node) *RecordBuilder {
 	return &RecordBuilder{
 		target:  n,
-		level:   0,
+		shape:   "record",
 		nesting: new(stack),
 	}
 }
@@ -59,29 +59,51 @@ func (r recordFieldId) writeOn(buf *strings.Builder) {
 	buf.WriteString(r.content)
 }
 
-func (r *RecordBuilder) AddField(content string) {
+func (r *RecordBuilder) MRecord() *RecordBuilder {
+	r.shape = "mrecord"
+	return r
+}
+
+// Field adds a record field
+func (r *RecordBuilder) Field(content string) *RecordBuilder {
 	rf := recordField{
 		id: recordFieldId{
 			content: content,
 		},
 	}
 	r.currentLabel = append(r.currentLabel, rf)
+	return r
 }
 
-func (r *RecordBuilder) FlipWhile(block func()) {
+// FieldWithId adds a record field
+func (r *RecordBuilder) FieldWithId(content, id string) *RecordBuilder {
+	rf := recordField{
+		id: recordFieldId{
+			id:      id,
+			content: content,
+		},
+	}
+	r.currentLabel = append(r.currentLabel, rf)
+	return r
+}
+
+// Nesting will create a nested (layout flipped) list of rlabel.
+func (r *RecordBuilder) Nesting(block func()) {
 	r.nesting.push(r.currentLabel)
 	r.currentLabel = recordLabel{}
-	r.level++
 	block()
-	// currentlabel has zero or more record fields
+	// currentLabel has fields added by block
+	// top of stack has label before block
 	top := r.nesting.pop()
-	// TODO
+	cpy := r.currentLabel[:]
+	top = append(top, recordField{
+		nestedLabel: &cpy,
+	})
 	r.currentLabel = top
-	r.level--
 }
 
 func (r *RecordBuilder) Build() error {
-	r.target.Attr("shape", "record")
+	r.target.Attr("shape", r.shape)
 	r.target.Attr("label", r.Label())
 	return nil
 }
@@ -90,7 +112,7 @@ func (r *RecordBuilder) Label() string {
 	buf := new(strings.Builder)
 	for i, each := range r.currentLabel {
 		if i > 0 {
-			buf.WriteString(" | ")
+			buf.WriteString("|")
 		}
 		each.writeOn(buf)
 	}
