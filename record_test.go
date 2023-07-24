@@ -90,16 +90,18 @@ func TestStack(t *testing.T) {
 func ExampleRecordBuilder() {
 	g := NewGraph(Directed)
 
-	r1 := NewRecordBuilder(g.Node("struct1"))
+	r1 := g.Node("struct1").RecordBuilder()
 	r1.FieldWithId("left", "f0")
-	r1.FieldWithId("mid dle", "f1")
+	r1.FieldWithId("mid&#92;dle", "f1")
 	r1.FieldWithId("right", "f2")
+	r1.Build()
 
-	r2 := NewRecordBuilder(g.Node("struct2"))
+	r2 := g.Node("struct2").RecordBuilder()
 	r2.FieldWithId("one", "f0")
+	r2.Build()
 
-	r3 := NewRecordBuilder(g.Node("struct3"))
-	r3.Field("hello world")
+	r3 := g.Node("struct3").RecordBuilder()
+	r3.Field("hello&#92;world")
 	r3.Nesting(func() {
 		r3.Field("b")
 		r3.Nesting(func() {
@@ -111,8 +113,11 @@ func ExampleRecordBuilder() {
 	})
 	r3.Field("g")
 	r3.Field("h")
+	r3.Build()
 
-	g.Node("struct1").Edge(g.Node("struct2"))
+	g.EdgeWithPorts(g.Node("struct1"), g.Node("struct2"), "f1", "f0")
+	g.EdgeWithPorts(g.Node("struct1"), g.Node("struct3"), "f2", "here")
 
-	fmt.Println(g.String())
+	fmt.Println(flatten(g.String()))
+	// Output:digraph  {n1[label="<f0> left|<f1> mid&#92;dle|<f2> right",shape="record"];n2[label="<f0> one",shape="record"];n3[label="hello&#92;world|{b|{c|<here> d|e}|f}|g|h",shape="record"];n1:f1->n2:f0;n1:f2->n3:here;}
 }
