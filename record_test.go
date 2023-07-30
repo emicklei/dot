@@ -8,7 +8,7 @@ import (
 func TestSimpleRecord(t *testing.T) {
 	g := NewGraph(Directed)
 
-	rb := NewRecordBuilder(g.Node("r"))
+	rb := newRecordBuilder(g.Node("r"))
 	rb.Field("a")
 	rb.Build()
 
@@ -20,7 +20,7 @@ func TestSimpleRecord(t *testing.T) {
 func TestSimpleMRecordWithFieldID(t *testing.T) {
 	g := NewGraph(Directed)
 
-	rb := NewRecordBuilder(g.Node("r"))
+	rb := newRecordBuilder(g.Node("r"))
 	rb.MRecord()
 	rb.FieldWithId("a", "a1")
 	rb.Build()
@@ -33,7 +33,7 @@ func TestSimpleMRecordWithFieldID(t *testing.T) {
 func TestTwoColumnsRecord(t *testing.T) {
 	g := NewGraph(Directed)
 
-	rb := NewRecordBuilder(g.Node("r"))
+	rb := newRecordBuilder(g.Node("r"))
 	rb.Field("a").Field("b")
 	rb.Build()
 
@@ -45,7 +45,7 @@ func TestTwoColumnsRecord(t *testing.T) {
 func TestTwoColumnsNestedRecord(t *testing.T) {
 	g := NewGraph(Directed)
 
-	rb := NewRecordBuilder(g.Node("r"))
+	rb := newRecordBuilder(g.Node("r"))
 	rb.Field("a")
 	rb.Nesting(func() {
 		rb.Field("b")
@@ -87,20 +87,20 @@ func TestStack(t *testing.T) {
 	    struct1:f2 -> struct3:here;
 	}
 */
-func ExampleRecordBuilder() {
+func ExampleNode_NewRecordBuilder() {
 	g := NewGraph(Directed)
 
-	r1 := g.Node("struct1").RecordBuilder()
+	r1 := g.Node("struct1").NewRecordBuilder()
 	r1.FieldWithId("left", "f0")
 	r1.FieldWithId("mid&#92;dle", "f1")
 	r1.FieldWithId("right", "f2")
 	r1.Build()
 
-	r2 := g.Node("struct2").RecordBuilder()
+	r2 := g.Node("struct2").NewRecordBuilder()
 	r2.FieldWithId("one", "f0")
 	r2.Build()
 
-	r3 := g.Node("struct3").RecordBuilder()
+	r3 := g.Node("struct3").NewRecordBuilder()
 	r3.Field("hello&#92;world")
 	r3.Nesting(func() {
 		r3.Field("b")
