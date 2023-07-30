@@ -1,5 +1,14 @@
 # Change history of the dot package
 
+
+## v1.6.0 - 2023-07-30
+
+- add Record builder
+
+## v1.5.0 - 2023-06-20
+
+- add GetID on Graph
+
 ## v1.4.0 - 2023-03-28
 
 - add Composite extension
