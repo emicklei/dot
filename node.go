@@ -54,8 +54,8 @@ func (n Node) BidirectionalEdge(toAndFromNode Node) []Edge {
 	return []Edge{e1, e2}
 }
 
-// RecordBuilder returns a new RecordBuilder for constructing the label of the node.
+// NewRecordBuilder returns a new recordBuilder for setting the attributes for a record-shaped node.
 // Call Build() on the builder to set the label and shape.
-func (n Node) RecordBuilder() *RecordBuilder {
-	return NewRecordBuilder(n)
+func (n Node) NewRecordBuilder() *recordBuilder {
+	return newRecordBuilder(n)
 }

@@ -5,17 +5,17 @@ import (
 	"strings"
 )
 
-// RecordBuilder can build the label of a node with shape "record" or "mrecord".
-type RecordBuilder struct {
+// recordBuilder can build the label of a node with shape "record" or "mrecord".
+type recordBuilder struct {
 	target       Node
 	shape        string
 	nesting      *stack
 	currentLabel recordLabel
 }
 
-// NewRecordBuilder returns a new RecordBuilder for constructing the label of the node.
-func NewRecordBuilder(n Node) *RecordBuilder {
-	return &RecordBuilder{
+// newRecordBuilder returns a new recordBuilder for constructing the label of the node.
+func newRecordBuilder(n Node) *recordBuilder {
+	return &recordBuilder{
 		target:  n,
 		shape:   "record",
 		nesting: new(stack),
@@ -62,13 +62,13 @@ func (r recordFieldId) writeOn(buf *strings.Builder) {
 }
 
 // MRecord sets the shape of the node to "mrecord"
-func (r *RecordBuilder) MRecord() *RecordBuilder {
+func (r *recordBuilder) MRecord() *recordBuilder {
 	r.shape = "mrecord"
 	return r
 }
 
 // Field adds a record field
-func (r *RecordBuilder) Field(content string) *RecordBuilder {
+func (r *recordBuilder) Field(content string) *recordBuilder {
 	rf := recordField{
 		id: recordFieldId{
 			content: content,
@@ -79,7 +79,7 @@ func (r *RecordBuilder) Field(content string) *RecordBuilder {
 }
 
 // FieldWithId adds a record field with an identifier for connecting edges.
-func (r *RecordBuilder) FieldWithId(content, id string) *RecordBuilder {
+func (r *recordBuilder) FieldWithId(content, id string) *recordBuilder {
 	rf := recordField{
 		id: recordFieldId{
 			id:      id,
@@ -91,7 +91,7 @@ func (r *RecordBuilder) FieldWithId(content, id string) *RecordBuilder {
 }
 
 // Nesting will create a nested (layout flipped) list of rlabel.
-func (r *RecordBuilder) Nesting(block func()) {
+func (r *recordBuilder) Nesting(block func()) {
 	r.nesting.push(r.currentLabel)
 	r.currentLabel = recordLabel{}
 	block()
@@ -106,14 +106,14 @@ func (r *RecordBuilder) Nesting(block func()) {
 }
 
 // Build sets the computed label and shape
-func (r *RecordBuilder) Build() error {
+func (r *recordBuilder) Build() error {
 	r.target.Attr("shape", r.shape)
 	r.target.Attr("label", r.Label())
 	return nil
 }
 
 // Label returns the computed label
-func (r *RecordBuilder) Label() string {
+func (r *recordBuilder) Label() string {
 	buf := new(strings.Builder)
 	for i, each := range r.currentLabel {
 		if i > 0 {

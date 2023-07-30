@@ -95,6 +95,11 @@ HTML and Literal values
 
 See also `ext/Subsystem` type for creating composition hierchies.
 
+
+## record example
+
+See `record_test.go#ExampleNode_NewRecordBuilder`.
+
 ## About dot attributes
 
 https://graphviz.gitlab.io/doc/info/attrs.html
