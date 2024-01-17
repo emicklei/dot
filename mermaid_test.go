@@ -45,7 +45,7 @@ func TestMermaidShapes(t *testing.T) {
 	di := NewGraph(Directed)
 	di.Node("round").Attr("shape", MermaidShapeRound)
 	di.Node("asym").Attr("shape", MermaidShapeAsymmetric)
-	di.Node("circ").Attr("shape", MermaidShapeCirle)
+	di.Node("circ").Attr("shape", MermaidShapeCircle)
 	di.Node("cyl").Attr("shape", MermaidShapeCylinder)
 	di.Node("rhom").Attr("shape", MermaidShapeRhombus)
 	di.Node("stad").Attr("shape", MermaidShapeStadium)
@@ -55,6 +55,17 @@ func TestMermaidShapes(t *testing.T) {
 	s := MermaidGraph(di, MermaidLeftToRight)
 	// t.Log(s)
 	if got, want := flatten(s), `graph LR;n2>"asym"];n3(("circ"));n4[("cyl")];n5{"rhom"};n1("round");n6(["stad"]);n7[["sub"]];n8[/"trap"\];n9[\"trapalt"/];`; got != want {
+		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
+	}
+}
+
+// Deprecated: Use MermaidShapeCircle instead of MermaidShapeCirle
+func TestMermaidShapeCirle(t *testing.T) {
+	di := NewGraph(Directed)
+	di.Node("circ").Attr("shape", MermaidShapeCirle)
+	s := MermaidGraph(di, MermaidLeftToRight)
+	// t.Log(s)
+	if got, want := flatten(s), `graph LR;n1(("circ"));`; got != want {
 		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
 	}
 }
