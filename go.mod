@@ -1,3 +1,3 @@
 module github.com/emicklei/dot
 
-go 1.21.6
+go 1.13
