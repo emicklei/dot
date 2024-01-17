@@ -19,7 +19,7 @@ type Connectable interface {
 const (
 	// SameGraph means that the composite graph will be a cluster within the graph.
 	SameGraph compositeGraphKind = iota
-	// ExternalGraph means the the composite graph will be exported on its own, linked by the node within the graph
+	// ExternalGraph means the composite graph will be exported on its own, linked by the node within the graph
 	ExternalGraph
 )
 
@@ -64,10 +64,10 @@ func (s *Composite) Attr(label string, value interface{}) dot.Node {
 // ExportName argument name will be used for the .dot export and the HREF link using svg
 // So if name = "my example" then export will create "my_example.dot" and the link will be "my_example.svg"
 func (s *Composite) ExportName(name string) {
-	href := strings.ReplaceAll(name, " ", "_") + ".svg"
-	dot := strings.ReplaceAll(name, " ", "_") + ".dot"
-	s.outerNode.Attr("href", href)
-	s.dotFilename = dot
+	hrefFile := strings.ReplaceAll(name, " ", "_") + ".svg"
+	dotFile := strings.ReplaceAll(name, " ", "_") + ".dot"
+	s.outerNode.Attr("href", hrefFile)
+	s.dotFilename = dotFile
 }
 
 // Input creates an edge.

@@ -19,7 +19,7 @@ var (
 	MermaidShapeStadium      = shape{"([", "])"}
 	MermaidShapeSubroutine   = shape{"[[", "]]"}
 	MermaidShapeCylinder     = shape{"[(", ")]"}
-	MermaidShapeCirle        = shape{"((", "))"}
+	MermaidShapeCircle       = shape{"((", "))"}
 	MermaidShapeAsymmetric   = shape{">", "]"}
 	MermaidShapeRhombus      = shape{"{", "}"}
 	MermaidShapeTrapezoid    = shape{"[/", "\\]"}

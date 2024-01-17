@@ -45,7 +45,7 @@ func TestMermaidShapes(t *testing.T) {
 	di := NewGraph(Directed)
 	di.Node("round").Attr("shape", MermaidShapeRound)
 	di.Node("asym").Attr("shape", MermaidShapeAsymmetric)
-	di.Node("circ").Attr("shape", MermaidShapeCirle)
+	di.Node("circ").Attr("shape", MermaidShapeCircle)
 	di.Node("cyl").Attr("shape", MermaidShapeCylinder)
 	di.Node("rhom").Attr("shape", MermaidShapeRhombus)
 	di.Node("stad").Attr("shape", MermaidShapeStadium)
