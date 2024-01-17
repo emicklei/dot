@@ -59,6 +59,17 @@ func TestMermaidShapes(t *testing.T) {
 	}
 }
 
+// Deprecated: Use MermaidShapeCircle instead of MermaidShapeCirle
+func TestMermaidShapeCirle(t *testing.T) {
+	di := NewGraph(Directed)
+	di.Node("circ").Attr("shape", MermaidShapeCirle)
+	s := MermaidGraph(di, MermaidLeftToRight)
+	// t.Log(s)
+	if got, want := flatten(s), `graph LR;n1(("circ"));`; got != want {
+		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
+	}
+}
+
 func TestUndirectedMermaid(t *testing.T) {
 	un := NewGraph(Undirected)
 	un.Node("love").Edge(un.Node("happinez"))
