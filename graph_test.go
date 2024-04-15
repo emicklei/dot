@@ -1,7 +1,6 @@
 package dot
 
 import (
-	"io/ioutil"
 	"os"
 	"reflect"
 	"strings"
@@ -13,6 +12,18 @@ func TestEmpty(t *testing.T) {
 	if got, want := flatten(di.String()), `digraph  {}`; got != want {
 		t.Errorf("got [%v] want [%v]", got, want)
 	}
+}
+
+func TestEmptyStrictDirected(t *testing.T) {
+	di := NewGraph(Directed, Strict)
+	if got, want := flatten(di.String()), `strict digraph  {}`; got != want {
+		t.Errorf("got [%v] want [%v]", got, want)
+	}
+	di2 := NewGraph(Strict, Directed)
+	if got, want := flatten(di2.String()), `strict digraph  {}`; got != want {
+		t.Errorf("got [%v] want [%v]", got, want)
+	}
+
 }
 
 func TestOverrideID(t *testing.T) {
@@ -145,6 +156,19 @@ func TestSubgraph(t *testing.T) {
 
 }
 
+func TestSubgraphIgnoreStrict(t *testing.T) {
+	di := NewGraph()
+	_ = di.Subgraph("test", ClusterOption{}, Strict)
+	if got, want := flatten(di.String()), `digraph  {subgraph cluster_s1 {label="test";}}`; got != want {
+		t.Errorf("got [%v] want [%v]", got, want)
+	}
+	di2 := NewGraph()
+	_ = di2.Subgraph("test", Strict, ClusterOption{})
+	if got, want := flatten(di2.String()), `digraph  {subgraph cluster_s1 {label="test";}}`; got != want {
+		t.Errorf("got [%v] want [%v]", got, want)
+	}
+}
+
 func TestSubgraphClusterOption(t *testing.T) {
 	di := NewGraph(Directed)
 	sub := di.Subgraph("test", ClusterOption{})
@@ -187,7 +211,7 @@ func TestCluster(t *testing.T) {
 	insideThree := clusterB.Node("three")
 	insideFour := clusterB.Node("four")
 	outside.Edge(insideFour).Edge(insideOne).Edge(insideTwo).Edge(insideThree).Edge(outside)
-	ioutil.WriteFile("doc/cluster.dot", []byte(di.String()), os.ModePerm)
+	os.WriteFile("doc/cluster.dot", []byte(di.String()), os.ModePerm)
 }
 
 // remove tabs and newlines and spaces
