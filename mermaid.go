@@ -63,7 +63,7 @@ func diagram(g *Graph, diagramType string, orientation int) string {
 	diagramGraph(g, sb)
 	for _, id := range g.sortedSubgraphsKeys() {
 		each := g.subgraphs[id]
-		fmt.Fprintf(sb, "subgraph %s;\n", id)
+		fmt.Fprintf(sb, "subgraph %s [%s];\n", id, each.attributes["label"])
 		diagramGraph(each, sb)
 		fmt.Fprintln(sb, "end;")
 	}
