@@ -79,3 +79,21 @@ func TestUndirectedMermaid(t *testing.T) {
 		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
 	}
 }
+
+// example from https://mermaid.js.org/syntax/flowchart.html
+// note that c1 and a2 are nodes created in their subgraphs to make the diagram match with the example.
+func TestMermaidSubgraph(t *testing.T) {
+	di := NewGraph(Directed)
+	sub1 := di.Subgraph("one")
+	sub1.Node("a1").Edge(sub1.Node("a2"))
+	sub2 := di.Subgraph("two")
+	sub2.Node("b1").Edge(sub2.Node("b2"))
+	sub3 := di.Subgraph("three")
+	sub3.Node("c1").Edge(sub3.Node("c2"))
+
+	sub3.Node("c1").Edge(sub1.Node("a2"))
+	mf := MermaidFlowchart(di, MermaidLeftToRight)
+	if got, want := flatten(mf), `flowchart LR;n8-->n3;subgraph one;n2("a1");n3("a2");n2-->n3;end;subgraph three;n8("c1");n9("c2");n8-->n9;end;subgraph two;n5("b1");n6("b2");n5-->n6;end;`; got != want {
+		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+	}
+}

@@ -60,6 +60,17 @@ func diagram(g *Graph, diagramType string, orientation int) string {
 		sb.WriteString("TD")
 	}
 	writeEnd(sb)
+	diagramGraph(g, sb)
+	for _, id := range g.sortedSubgraphsKeys() {
+		each := g.subgraphs[id]
+		fmt.Fprintf(sb, "subgraph %s;\n", id)
+		diagramGraph(each, sb)
+		fmt.Fprintln(sb, "end;")
+	}
+	return sb.String()
+}
+
+func diagramGraph(g *Graph, sb *strings.Builder) {
 	// graph nodes
 	for _, key := range g.sortedNodesKeys() {
 		nodeShape := MermaidShapeRound
@@ -92,7 +103,6 @@ func diagram(g *Graph, diagramType string, orientation int) string {
 			}
 		}
 	}
-	return sb.String()
 }
 
 func writeEnd(sb *strings.Builder) {

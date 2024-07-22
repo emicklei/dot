@@ -119,6 +119,12 @@ g := dot.NewGraph(dot.Directed)
 fmt.Println(dot.MermaidGraph(g, dot.MermaidTopToBottom))
 ```
 
+### subgraphs in mermaid
+
+```mermaid
+flowchart LR;n8-->n3;subgraph one;n2("a1");n3("a2");n2-->n3;end;subgraph three;n8("c1");n9("c2");n8-->n9;end;subgraph two;n5("b1");n6("b2");n5-->n6;end;
+```
+
 ## extensions
 
 See also package `dot/dotx` for types that can help in constructing complex graphs.
