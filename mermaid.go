@@ -15,16 +15,20 @@ const (
 )
 
 var (
-	MermaidShapeRound        = shape{"(", ")"}
-	MermaidShapeStadium      = shape{"([", "])"}
-	MermaidShapeSubroutine   = shape{"[[", "]]"}
-	MermaidShapeCylinder     = shape{"[(", ")]"}
-	MermaidShapeCirle        = shape{"((", "))"} // Deprecated: use MermaidShapeCircle instead
-	MermaidShapeCircle       = shape{"((", "))"}
-	MermaidShapeAsymmetric   = shape{">", "]"}
-	MermaidShapeRhombus      = shape{"{", "}"}
-	MermaidShapeTrapezoid    = shape{"[/", "\\]"}
-	MermaidShapeTrapezoidAlt = shape{"[\\", "/]"}
+	MermaidShapeRound            = shape{"(", ")"}
+	MermaidShapeStadium          = shape{"([", "])"}
+	MermaidShapeSubroutine       = shape{"[[", "]]"}
+	MermaidShapeCylinder         = shape{"[(", ")]"}
+	MermaidShapeCirle            = shape{"((", "))"} // Deprecated: use MermaidShapeCircle instead
+	MermaidShapeCircle           = shape{"((", "))"}
+	MermaidShapeAsymmetric       = shape{">", "]"}
+	MermaidShapeRhombus          = shape{"{", "}"}
+	MermaidShapeTrapezoid        = shape{"[/", "\\]"}
+	MermaidShapeTrapezoidAlt     = shape{"[\\", "/]"}
+	MermaidShapeHexagon          = shape{"[{{", "}}]"}
+	MermaidShapeParallelogram    = shape{"[/", "/]"}
+	MermaidShapeParallelogramAlt = shape{"[\\", "\\]"}
+	// TODO more shapes see https://mermaid.js.org/syntax/flowchart.html#node-shapes
 )
 
 type shape struct {
@@ -96,10 +100,15 @@ func diagramGraph(g *Graph, sb *strings.Builder) {
 	for _, each := range g.sortedEdgesFromKeys() {
 		all := g.edgesFrom[each]
 		for _, each := range all {
+			// The edge can override the link style
+			link := denoteEdge
+			if l := each.GetAttr("link"); l != nil {
+				link = l.(string)
+			}
 			if label := each.GetAttr("label"); label != nil {
-				fmt.Fprintf(sb, "\tn%d%s|%s|n%d;\n", each.from.seq, denoteEdge, escape(label.(string)), each.to.seq)
+				fmt.Fprintf(sb, "\tn%d%s|%s|n%d;\n", each.from.seq, link, escape(label.(string)), each.to.seq)
 			} else {
-				fmt.Fprintf(sb, "\tn%d%sn%d;\n", each.from.seq, denoteEdge, each.to.seq)
+				fmt.Fprintf(sb, "\tn%d%sn%d;\n", each.from.seq, link, each.to.seq)
 			}
 		}
 	}
