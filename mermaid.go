@@ -25,7 +25,7 @@ var (
 	MermaidShapeRhombus          = shape{"{", "}"}
 	MermaidShapeTrapezoid        = shape{"[/", "\\]"}
 	MermaidShapeTrapezoidAlt     = shape{"[\\", "/]"}
-	MermaidShapeHexagon          = shape{"[{{", "}}]"}
+	MermaidShapeHexagon          = shape{"{{", "}}"}
 	MermaidShapeParallelogram    = shape{"[/", "/]"}
 	MermaidShapeParallelogramAlt = shape{"[\\", "\\]"}
 	// TODO more shapes see https://mermaid.js.org/syntax/flowchart.html#node-shapes
