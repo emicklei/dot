@@ -1,6 +1,11 @@
 # Change history of the dot package
 
 
+## v1.6.3
+
+- fix empty label for mermaid
+- allow link attribute for edge in mermaid
+
 ## v1.6.2
 
 - fix issue #38 : incorrect handling of strict option (thx kiambogo)

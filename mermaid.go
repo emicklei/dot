@@ -106,10 +106,17 @@ func diagramGraph(g *Graph, sb *strings.Builder) {
 				link = l.(string)
 			}
 			if label := each.GetAttr("label"); label != nil {
-				fmt.Fprintf(sb, "\tn%d%s|%s|n%d;\n", each.from.seq, link, escape(label.(string)), each.to.seq)
-			} else {
-				fmt.Fprintf(sb, "\tn%d%sn%d;\n", each.from.seq, link, each.to.seq)
+				slabel, ok := label.(string)
+				if !ok {
+					slabel = fmt.Sprintf("%v", label)
+				}
+				if label != "" {
+					fmt.Fprintf(sb, "\tn%d%s|%s|n%d;\n", each.from.seq, link, escape(slabel), each.to.seq)
+					continue
+				}
 			}
+			// no label
+			fmt.Fprintf(sb, "\tn%d%sn%d;\n", each.from.seq, link, each.to.seq)
 		}
 	}
 }
