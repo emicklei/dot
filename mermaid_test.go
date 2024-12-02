@@ -97,3 +97,45 @@ func TestMermaidSubgraph(t *testing.T) {
 		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 	}
 }
+
+func TestMermaidFromBoxShape(t *testing.T) {
+	graph := NewGraph(Directed)
+	graph.Node("A").Box()
+	graph.Edge(graph.Node("A"), graph.Node("B"))
+
+	if got, want := flatten(MermaidGraph(graph, MermaidTopDown)), `graph TD;n1("A");n2("B");n1-->n2;`; got != want {
+		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+	}
+}
+func TestLookupShape(t *testing.T) {
+	tests := []struct {
+		name      string
+		shapeName string
+		wantShape shape
+		wantOk    bool
+	}{
+		{"round", "round", MermaidShapeRound, true},
+		{"box", "box", MermaidShapeRound, true},
+		{"asymmetric", "asymmetric", MermaidShapeAsymmetric, true},
+		{"circle", "circle", MermaidShapeCircle, true},
+		{"cylinder", "cylinder", MermaidShapeCylinder, true},
+		{"rhombux", "rhombux", MermaidShapeRhombus, true},
+		{"stadium", "stadium", MermaidShapeStadium, true},
+		{"subroutine", "subroutine", MermaidShapeSubroutine, true},
+		{"trapezoid", "trapezoid", MermaidShapeTrapezoid, true},
+		{"trapezoid-alt", "trapezoid-alt", MermaidShapeTrapezoidAlt, true},
+		{"hexagon", "hexagon", MermaidShapeHexagon, true},
+		{"parallelogram", "parallelogram", MermaidShapeParallelogram, true},
+		{"parallelogram-alt", "parallelogram-alt", MermaidShapeParallelogramAlt, true},
+		{"unknown", "unknown", shape{}, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotShape, gotOk := lookupShape(tt.shapeName)
+			if gotShape != tt.wantShape || gotOk != tt.wantOk {
+				t.Errorf("lookupShape(%q) = (%v, %v), want (%v, %v)", tt.shapeName, gotShape, gotOk, tt.wantShape, tt.wantOk)
+			}
+		})
+	}
+}

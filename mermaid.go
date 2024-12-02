@@ -80,11 +80,28 @@ func diagramGraph(g *Graph, sb *strings.Builder) {
 		nodeShape := MermaidShapeRound
 		each := g.nodes[key]
 		if s := each.GetAttr("shape"); s != nil {
-			nodeShape = s.(shape)
+			// could be a shape or a string
+			shapeString, ok := s.(string)
+			if ok {
+				// see if we can map the string to a shape
+				mermaidShape, ok := lookupShape(shapeString)
+				if ok {
+					nodeShape = mermaidShape
+				}
+			}
+			// could be a shape
+			mermaidShape, ok := s.(shape)
+			if ok {
+				nodeShape = mermaidShape
+			}
 		}
 		txt := "?"
 		if label := each.GetAttr("label"); label != nil {
-			txt = label.(string)
+			// take string only
+			slabel, ok := label.(string)
+			if ok {
+				txt = slabel
+			}
 		}
 		fmt.Fprintf(sb, "\tn%d%s%s%s;\n", each.seq, nodeShape.open, escape(txt), nodeShape.close)
 		if style := each.GetAttr("style"); style != nil {
@@ -103,11 +120,16 @@ func diagramGraph(g *Graph, sb *strings.Builder) {
 			// The edge can override the link style
 			link := denoteEdge
 			if l := each.GetAttr("link"); l != nil {
-				link = l.(string)
+				// take string only
+				slink, ok := l.(string)
+				if ok {
+					link = slink
+				}
 			}
 			if label := each.GetAttr("label"); label != nil {
 				slabel, ok := label.(string)
 				if !ok {
+					// make it a string
 					slabel = fmt.Sprintf("%v", label)
 				}
 				if label != "" {
@@ -123,4 +145,34 @@ func diagramGraph(g *Graph, sb *strings.Builder) {
 
 func writeEnd(sb *strings.Builder) {
 	sb.WriteString(";\n")
+}
+
+func lookupShape(shapeName string) (shape, bool) {
+	switch shapeName {
+	case "round", "box":
+		return MermaidShapeRound, true
+	case "asymmetric":
+		return MermaidShapeAsymmetric, true
+	case "circle":
+		return MermaidShapeCircle, true
+	case "cylinder":
+		return MermaidShapeCylinder, true
+	case "rhombux":
+		return MermaidShapeRhombus, true
+	case "stadium":
+		return MermaidShapeStadium, true
+	case "subroutine":
+		return MermaidShapeSubroutine, true
+	case "trapezoid":
+		return MermaidShapeTrapezoid, true
+	case "trapezoid-alt":
+		return MermaidShapeTrapezoidAlt, true
+	case "hexagon":
+		return MermaidShapeHexagon, true
+	case "parallelogram":
+		return MermaidShapeParallelogram, true
+	case "parallelogram-alt":
+		return MermaidShapeParallelogramAlt, true
+	}
+	return shape{}, false
 }
