@@ -1,5 +1,8 @@
 # Change history of the dot package
 
+## v1.6.4
+
+- fix mermaid generation with string shape in node (issue #40)
 
 ## v1.6.3
 
