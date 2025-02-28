@@ -418,3 +418,12 @@ func (g *Graph) EdgesMap() map[string][]Edge {
 func (g *Graph) HasNode(n Node) bool {
 	return g == n.graph
 }
+
+// GetAttributes returns a copy of the attributes
+func (am *AttributesMap) GetAttributes() map[string]interface{} {
+	copyMap := make(map[string]interface{}, len(am.attributes))
+	for k, v := range am.attributes {
+		copyMap[k] = v
+	}
+	return copyMap
+}

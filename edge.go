@@ -71,3 +71,8 @@ func (e Edge) From() Node {
 func (e Edge) To() Node {
 	return e.to
 }
+
+// Returns attributes for this edge
+func (e Edge) GetAttributes() map[string]interface{} {
+	return e.AttributesMap.GetAttributes()
+}

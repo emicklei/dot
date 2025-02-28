@@ -119,3 +119,17 @@ func TestNonStringAttribute(t *testing.T) {
 		t.Errorf("got [%v] want [%v]", got, want)
 	}
 }
+
+func TestEdgeGetAttributes(t *testing.T) {
+	di := NewGraph(Directed)
+	n1 := di.Node("A")
+	n2 := di.Node("B")
+	e := di.Edge(n1, n2).Label("edge-label").Attr("foo", "bar")
+	attrs := e.GetAttributes()
+	if v, ok := attrs["label"]; !ok || v != "edge-label" {
+		t.Errorf("expected label=edge-label, got %v", attrs)
+	}
+	if v, ok := attrs["foo"]; !ok || v != "bar" {
+		t.Errorf("expected foo=bar, got %v", attrs)
+	}
+}
