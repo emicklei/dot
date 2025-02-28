@@ -1,5 +1,9 @@
 # Change history of the dot package
 
+## v1.7.0
+
+- add GetAttributes (Node and Edge) (thx @jasonmadigan)
+
 ## v1.6.4
 
 - fix mermaid generation with string shape in node (issue #40)

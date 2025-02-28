@@ -80,6 +80,26 @@ func TestUndirectedMermaid(t *testing.T) {
 	}
 }
 
+func TestNonStringLinkEdge(t *testing.T) {
+	un := NewGraph(Undirected)
+	un.Node("love").Edge(un.Node("happinez")).Attr("link", "---")
+	s := MermaidFlowchart(un, MermaidLeftToRight)
+	//t.Log(s)
+	if got, want := flatten(s), `flowchart LR;n2("happinez");n1("love");n1---n2;`; got != want {
+		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
+	}
+}
+
+func TestNonStringLabelEdge(t *testing.T) {
+	un := NewGraph(Undirected)
+	un.Node("love").Edge(un.Node("happinez")).Attr("label", true)
+	s := MermaidFlowchart(un, MermaidLeftToRight)
+	//t.Log(s)
+	if got, want := flatten(s), `flowchart LR;n2("happinez");n1("love");n1---|"true"|n2;`; got != want {
+		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
+	}
+}
+
 // example from https://mermaid.js.org/syntax/flowchart.html
 // note that c1 and a2 are nodes created in their subgraphs to make the diagram match with the example.
 func TestMermaidSubgraph(t *testing.T) {
