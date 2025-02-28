@@ -414,3 +414,15 @@ func TestFindNodeWithLabel(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestNodeGetAttributesCopy(t *testing.T) {
+	di := NewGraph(Directed)
+	n := di.Node("A")
+	n.Attr("foo", "bar")
+	attrs := n.GetAttributes()
+	attrs["foo"] = "bar"
+	attrs2 := n.GetAttributes()
+	if v, ok := attrs2["foo"]; !ok || v != "bar" {
+		t.Errorf("expected foo=bar, got %v", attrs2)
+	}
+}
