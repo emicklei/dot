@@ -3,6 +3,7 @@ package dot
 import (
 	"os"
 	"reflect"
+	"sort"
 	"strings"
 	"testing"
 )
@@ -424,5 +425,102 @@ func TestNodeGetAttributesCopy(t *testing.T) {
 	attrs2 := n.GetAttributes()
 	if v, ok := attrs2["foo"]; !ok || v != "bar" {
 		t.Errorf("expected foo=bar, got %v", attrs2)
+	}
+}
+
+func TestDeepCopy(t *testing.T) {
+	g := NewGraph(Directed)
+	g.ID("original")
+	g.Attr("color", "blue")
+
+	n1 := g.Node("A").Attr("label", "Node A")
+	n2 := g.Node("B").Attr("label", "Node B")
+	n3 := g.Node("C").Attr("label", "Node C")
+
+	e1 := g.Edge(n1, n2).Label("A to B")
+	e1.Attr("weight", 2)
+
+	sub := g.Subgraph("sub1")
+	sub.Node("D").Attr("label", "Node D")
+
+	g.AddToSameRank("top-row", n1, n2, n3)
+
+	copy := g.DeepCopy()
+
+	if copy.GetID() != g.GetID() {
+		t.Errorf("Expected graph ID %v, got %v", g.GetID(), copy.GetID())
+	}
+
+	if copy.Value("color") != g.Value("color") {
+		t.Errorf("Expected graph color %v, got %v", g.Value("color"), copy.Value("color"))
+	}
+
+	if len(copy.nodes) != len(g.nodes) {
+		t.Errorf("Expected %d nodes, got %d", len(g.nodes), len(copy.nodes))
+	}
+	for id, originalNode := range g.nodes {
+		copiedNode, exists := copy.nodes[id]
+		if !exists {
+			t.Errorf("Node %v missing in copied graph", id)
+		}
+		if copiedNode.Value("label") != originalNode.Value("label") {
+			t.Errorf("Node %v: expected label %v, got %v", id, originalNode.Value("label"), copiedNode.Value("label"))
+		}
+	}
+
+	if len(copy.edgesFrom) != len(g.edgesFrom) {
+		t.Errorf("Expected %d edges, got %d", len(g.edgesFrom), len(copy.edgesFrom))
+	}
+	for from, edges := range g.edgesFrom {
+		copiedEdges, exists := copy.edgesFrom[from]
+		if !exists {
+			t.Errorf("Edges from %v missing in copied graph", from)
+		}
+		for i, edge := range edges {
+			if copiedEdges[i].Value("label") != edge.Value("label") {
+				t.Errorf("Edge from %v: expected label %v, got %v", from, edge.Value("label"), copiedEdges[i].Value("label"))
+			}
+			if copiedEdges[i].Value("weight") != edge.Value("weight") {
+				t.Errorf("Edge from %v: expected weight %v, got %v", from, edge.Value("weight"), copiedEdges[i].Value("weight"))
+			}
+		}
+	}
+
+	keys := make([]string, 0, len(g.subgraphs))
+	for id := range g.subgraphs {
+		keys = append(keys, id)
+	}
+	sort.Strings(keys)
+	if len(copy.subgraphs) != len(g.subgraphs) {
+		t.Errorf("Expected %d subgraphs, got %d", len(g.subgraphs), len(copy.subgraphs))
+	}
+	for _, id := range keys {
+		originalSubgraph := g.subgraphs[id]
+		copiedSubgraph, exists := copy.subgraphs[id]
+		if !exists {
+			t.Errorf("Subgraph %v missing in copied graph", id)
+		}
+		if copiedSubgraph.GetID() != originalSubgraph.GetID() {
+			t.Errorf("Subgraph %v: expected ID %v, got %v", id, originalSubgraph.GetID(), copiedSubgraph.GetID())
+		}
+	}
+
+	rankKeys := make([]string, 0, len(g.sameRank))
+	for rank := range g.sameRank {
+		rankKeys = append(rankKeys, rank)
+	}
+	sort.Strings(rankKeys)
+	if len(copy.sameRank) != len(g.sameRank) {
+		t.Errorf("Expected sameRank groups to be copied")
+	}
+	for _, rank := range rankKeys {
+		originalNodes := g.sameRank[rank]
+		copiedNodes, exists := copy.sameRank[rank]
+		if !exists {
+			t.Errorf("Same-rank group %v missing in copied graph", rank)
+		}
+		if len(copiedNodes) != len(originalNodes) {
+			t.Errorf("Same-rank group %v: expected %d nodes, got %d", rank, len(originalNodes), len(copiedNodes))
+		}
 	}
 }
