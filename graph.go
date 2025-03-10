@@ -427,3 +427,72 @@ func (am *AttributesMap) GetAttributes() map[string]interface{} {
 	}
 	return copyMap
 }
+
+// DeepCopy creates a deep copy of a Graph, including all nodes, edges, subgraphs & attributes
+func (g *Graph) DeepCopy() *Graph {
+	copy := NewGraph()
+	copy.id = g.id
+	copy.isStrict = g.isStrict
+	copy.graphType = g.graphType
+	copy.seq = g.seq
+	copy.parent = g.parent
+
+	copy.AttributesMap = AttributesMap{attributes: g.GetAttributes()}
+
+	copy.nodes = make(map[string]Node, len(g.nodes))
+	for id, node := range g.nodes {
+		copy.nodes[id] = Node{
+			AttributesMap: AttributesMap{attributes: node.GetAttributes()},
+			graph:         copy,
+			id:            node.id,
+			seq:           node.seq,
+		}
+	}
+
+	copy.edgesFrom = make(map[string][]Edge, len(g.edgesFrom))
+	for from, edges := range g.edgesFrom {
+		newEdges := make([]Edge, len(edges))
+		for i, edge := range edges {
+			newEdges[i] = Edge{
+				AttributesMap: AttributesMap{attributes: edge.GetAttributes()},
+				graph:         copy,
+				from:          copy.nodes[edge.from.id],
+				to:            copy.nodes[edge.to.id],
+				fromPort:      edge.fromPort,
+				toPort:        edge.toPort,
+			}
+		}
+		copy.edgesFrom[from] = newEdges
+	}
+
+	copy.subgraphs = make(map[string]*Graph, len(g.subgraphs))
+	keys := make([]string, 0, len(g.subgraphs))
+	for id := range g.subgraphs {
+		keys = append(keys, id)
+	}
+	sort.Strings(keys)
+	for _, id := range keys {
+		newSubgraph := g.subgraphs[id].DeepCopy()
+		newSubgraph.parent = copy
+		copy.subgraphs[id] = newSubgraph
+	}
+
+	copy.sameRank = make(map[string][]Node, len(g.sameRank))
+	rankKeys := make([]string, 0, len(g.sameRank))
+	for rank := range g.sameRank {
+		rankKeys = append(rankKeys, rank)
+	}
+	sort.Strings(rankKeys)
+	for _, rank := range rankKeys {
+		newNodes := make([]Node, len(g.sameRank[rank]))
+		for i, node := range g.sameRank[rank] {
+			newNodes[i] = copy.nodes[node.id]
+		}
+		copy.sameRank[rank] = newNodes
+	}
+
+	copy.nodeInitializer = g.nodeInitializer
+	copy.edgeInitializer = g.edgeInitializer
+
+	return copy
+}
