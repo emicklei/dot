@@ -1,5 +1,9 @@
 # Change history of the dot package
 
+## v1.8.0
+
+- add Graph.DeepCopy() (thx @jasonmadigan)
+
 ## v1.7.0
 
 - add GetAttributes (Node and Edge) (thx @jasonmadigan)
