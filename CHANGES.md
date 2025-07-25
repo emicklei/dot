@@ -1,8 +1,12 @@
 # Change history of the dot package
 
+## v1.9.0 - 2025-07-25
+
+- add Graph.WalkEdges(func(edge Edge) bool)
+
 ## v1.8.0
 
-- add Graph.DeepCopy() (thx @jasonmadigan)
+- add Graph.DeepCopy(func(edge Edge) bool) (thx @jasonmadigan)
 
 ## v1.7.0
 

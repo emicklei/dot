@@ -42,6 +42,21 @@ func NewGraph(options ...GraphOption) *Graph {
 	return graph
 }
 
+// WalkEdges iterates over all edges in the graph and all its subgraphs recursively
+// and calls the callback function for each edge. Abort if the callback returns false.
+func (g *Graph) WalkEdges(callback func(edge Edge) bool) {
+	for _, edges := range g.edgesFrom {
+		for _, edge := range edges {
+			if !callback(edge) {
+				return
+			}
+		}
+		for _, subgraph := range g.subgraphs {
+			subgraph.WalkEdges(callback)
+		}
+	}
+}
+
 // GetID returns the identifier of the graph.
 func (g *Graph) GetID() string {
 	return g.id

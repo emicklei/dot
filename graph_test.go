@@ -154,7 +154,6 @@ func TestSubgraph(t *testing.T) {
 	if got, want := found, sub; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
-
 }
 
 func TestSubgraphIgnoreStrict(t *testing.T) {
@@ -213,6 +212,34 @@ func TestCluster(t *testing.T) {
 	insideFour := clusterB.Node("four")
 	outside.Edge(insideFour).Edge(insideOne).Edge(insideTwo).Edge(insideThree).Edge(outside)
 	os.WriteFile("doc/cluster.dot", []byte(di.String()), os.ModePerm)
+
+	count := 0
+	di.WalkEdges(func(e Edge) bool {
+		count++
+		return true
+	})
+	if got, want := count, 5; got != want {
+		t.Errorf("got [%v] want [%v]", got, want)
+	}
+}
+
+func TestAbortEdgesWalk(t *testing.T) {
+	di := NewGraph(Directed)
+	n1 := di.Node("A")
+	n2 := di.Node("B")
+	n3 := di.Node("C")
+	di.Edge(n1, n2)
+	di.Edge(n2, n3)
+
+	count := 0
+	di.WalkEdges(func(e Edge) bool {
+		count++
+		return e.To().ID() != "C" // Abort when reaching node C
+	})
+
+	if got, want := count, 2; got != want {
+		t.Errorf("got [%v] want [%v]", got, want)
+	}
 }
 
 // remove tabs and newlines and spaces
