@@ -51,9 +51,9 @@ func (g *Graph) WalkEdges(callback func(edge Edge) bool) {
 				return
 			}
 		}
-		for _, subgraph := range g.subgraphs {
-			subgraph.WalkEdges(callback)
-		}
+	}
+	for _, subgraph := range g.subgraphs {
+		subgraph.WalkEdges(callback)
 	}
 }
 
