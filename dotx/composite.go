@@ -130,7 +130,7 @@ func (s *Composite) ExportFile() error {
 	if s.kind != ExternalGraph {
 		return errors.New("ExportFile is only applicable to a ExternalGraph Composite")
 	}
-	return os.WriteFile(s.ExportFilename(), []byte(s.Graph.String()), os.ModePerm)
+	return os.WriteFile(s.ExportFilename(), []byte(s.Graph.String()), 0666)
 }
 
 // Export writes the DOT file for a Composite after building the content (child) graph using the build function.
