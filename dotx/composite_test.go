@@ -33,7 +33,7 @@ func TestExampleSubsystemSameGraph(t *testing.T) {
 	sub3 := sub2.Node("subcomponent 3")
 	sub2.Input("in3", sub3)
 
-	os.WriteFile("TestExampleSubsystemSameGraph.dot", []byte(g.String()), os.ModePerm)
+	os.WriteFile("TestExampleSubsystemSameGraph.dot", []byte(g.String()), 0666)
 }
 
 func TestExampleSubsystemExternalGraph(t *testing.T) {
@@ -63,7 +63,7 @@ func TestExampleSubsystemExternalGraph(t *testing.T) {
 		})
 	})
 
-	os.WriteFile("TestExampleSubsystemExternalGraph.dot", []byte(g.String()), os.ModePerm)
+	os.WriteFile("TestExampleSubsystemExternalGraph.dot", []byte(g.String()), 0666)
 }
 
 func TestAttrOnSubsystem(t *testing.T) {
@@ -87,7 +87,7 @@ func TestCompositeWithUnusedIOSameGraph(t *testing.T) {
 	sub.Input("in", c1)
 	sub.Output("out", c1)
 
-	os.WriteFile("TestCompositeWithUnusedIOSameGraph.dot", []byte(g.String()), os.ModePerm)
+	os.WriteFile("TestCompositeWithUnusedIOSameGraph.dot", []byte(g.String()), 0666)
 }
 
 func TestConnectToComposites(t *testing.T) {
