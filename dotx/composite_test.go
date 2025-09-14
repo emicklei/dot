@@ -8,6 +8,10 @@ import (
 	"github.com/emicklei/dot"
 )
 
+func writeDot() bool {
+	return os.Getenv("WRITE_DOT_TEST_OUTPUT") != "" // set to any value to write dot files
+}
+
 func TestExampleSubsystemSameGraph(t *testing.T) {
 	g := dot.NewGraph(dot.Directed)
 
@@ -33,7 +37,46 @@ func TestExampleSubsystemSameGraph(t *testing.T) {
 	sub3 := sub2.Node("subcomponent 3")
 	sub2.Input("in3", sub3)
 
-	os.WriteFile("TestExampleSubsystemSameGraph.dot", []byte(g.String()), 0666)
+	expected := `digraph  {
+	subgraph cluster_s2 {
+		subgraph cluster_s9 {
+			label="subsystem2";
+			n11[label="in3",shape="point"];
+			n12[label="out3",shape="point"];
+			n13[label="subcomponent 3"];
+			n11:s->n13:n[taillabel="in3"];
+			
+		}
+		label="subsystem";
+		n4[label="in1",shape="point"];
+		n5[label="in2",shape="point"];
+		n6[label="out2",shape="point"];
+		n7[label="subcomponent 1"];
+		n8[label="subcomponent 2"];
+		n10[href="subsystem2.svg",label="subsystem2",shape="box3d"];
+		n4:s->n7:n[taillabel="in1"];
+		n5:s->n8:n[taillabel="in2"];
+		n7->n8;
+		n7->n10[label="in3"];
+		n8:s->n6:n[headlabel="out2"];
+		n10->n8[label="out3"];
+		
+	}
+	
+	n1[label="component"];
+	n3[href="subsystem.svg",label="subsystem",shape="box3d"];
+	n1->n3[label="in1"];
+	n1->n3[label="in2"];
+	n3->n1[label="out2"];
+	
+}
+`
+	if got, want := g.String(), expected; got != want {
+		t.Errorf("got:\n%s\nwant:\n%s", got, want)
+	}
+	if writeDot() {
+		os.WriteFile("TestExampleSubsystemSameGraph.dot", []byte(g.String()), 0666)
+	}
 }
 
 func TestExampleSubsystemExternalGraph(t *testing.T) {
@@ -62,8 +105,29 @@ func TestExampleSubsystemExternalGraph(t *testing.T) {
 			sub2.Input("in3", sub3)
 		})
 	})
-
-	os.WriteFile("TestExampleSubsystemExternalGraph.dot", []byte(g.String()), 0666)
+	expected := `digraph  {
+	
+	n1[label="component"];
+	n2[href="subsystem.svg",label="subsystem",shape="box3d"];
+	n1->n2[label="in1"];
+	n1->n2[label="in2"];
+	n2->n1[label="out2"];
+	
+}
+`
+	if got, want := g.String(), expected; got != want {
+		t.Errorf("got:\n%s\nwant:\n%s", got, want)
+	}
+	if writeDot() {
+		os.WriteFile("TestExampleSubsystemExternalGraph.dot", []byte(g.String()), 0666)
+	} else {
+		if err := os.Remove("subsystem.dot"); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.Remove("subsystem2.dot"); err != nil {
+			t.Fatal(err)
+		}
+	}
 }
 
 func TestAttrOnSubsystem(t *testing.T) {
@@ -87,7 +151,9 @@ func TestCompositeWithUnusedIOSameGraph(t *testing.T) {
 	sub.Input("in", c1)
 	sub.Output("out", c1)
 
-	os.WriteFile("TestCompositeWithUnusedIOSameGraph.dot", []byte(g.String()), 0666)
+	if writeDot() {
+		os.WriteFile("TestCompositeWithUnusedIOSameGraph.dot", []byte(g.String()), 0666)
+	}
 }
 
 func TestConnectToComposites(t *testing.T) {

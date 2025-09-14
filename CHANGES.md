@@ -1,5 +1,9 @@
 # Change history of the dot package
 
+## v1.9.1 - 2025-09-14
+
+- do not use exe permission on exported dot files (thx come-maiz)
+
 ## v1.9.0 - 2025-07-25
 
 - add Graph.WalkEdges(func(edge Edge) bool)
