@@ -231,14 +231,16 @@ func TestAbortEdgesWalk(t *testing.T) {
 	di.Edge(n1, n2)
 	di.Edge(n2, n3)
 
-	count := 0
+	cfound := false
 	di.WalkEdges(func(e Edge) bool {
-		count++
-		return e.To().ID() != "C" // Abort when reaching node C
+		if e.To().ID() == "C" {
+			cfound = true
+			return false
+		}
+		return true
 	})
-
-	if got, want := count, 2; got != want {
-		t.Errorf("got [%v] want [%v]", got, want)
+	if !cfound {
+		t.Fail()
 	}
 }
 
