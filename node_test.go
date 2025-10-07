@@ -16,6 +16,9 @@ func TestNode_Box(t *testing.T) {
 func TestNode_Label(t *testing.T) {
 	g := NewGraph(Directed)
 	n := g.Node("A")
+	if !n.HasDefaultLabel() {
+		t.Fail()
+	}
 	n.Label("42")
 	if n.Value("label") != "42" {
 		t.Fail()

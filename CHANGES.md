@@ -1,5 +1,9 @@
 # Change history of the dot package
 
+## v1.9.2 - 2025-10-07
+
+- add Node.HasDefaultLabel()
+
 ## v1.9.1 - 2025-09-14
 
 - do not use exe permission on exported dot files (thx come-maiz)

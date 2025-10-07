@@ -59,3 +59,12 @@ func (n Node) BidirectionalEdge(toAndFromNode Node) []Edge {
 func (n Node) NewRecordBuilder() *recordBuilder {
 	return newRecordBuilder(n)
 }
+
+// HasDefaultLabel returns true if the node has a label set from its id.
+func (n Node) HasDefaultLabel() bool {
+	l, ok := n.attributes["label"]
+	if !ok {
+		return false
+	}
+	return l == n.id
+}
