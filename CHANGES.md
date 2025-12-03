@@ -1,5 +1,13 @@
 # Change history of the dot package
 
+## v1.10.0 - 2025-12-03
+
+- add Node.Apply
+- add Edge.Apply
+- handle Mermaid linkStyle for Edge
+- handle Mermaid animate for Edge
+- spaces around Mermaid edges
+
 ## v1.9.2 - 2025-10-07
 
 - add Node.HasDefaultLabel()

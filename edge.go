@@ -76,3 +76,9 @@ func (e Edge) To() Node {
 func (e Edge) GetAttributes() map[string]interface{} {
 	return e.AttributesMap.GetAttributes()
 }
+
+// Apply exists to allow fluent style modifications of the attributes of an Edge.
+func (e Edge) Apply(modifier func(Edge)) Edge {
+	modifier(e)
+	return e
+}

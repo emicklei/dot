@@ -68,3 +68,9 @@ func (n Node) HasDefaultLabel() bool {
 	}
 	return l == n.id
 }
+
+// Apply exists to allow fluent style modifications of the attributes of a Node.
+func (n Node) Apply(modifier func(Node)) Node {
+	modifier(n)
+	return n
+}

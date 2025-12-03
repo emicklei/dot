@@ -15,11 +15,12 @@ const (
 )
 
 var (
-	MermaidShapeRound            = shape{"(", ")"}
-	MermaidShapeStadium          = shape{"([", "])"}
-	MermaidShapeSubroutine       = shape{"[[", "]]"}
-	MermaidShapeCylinder         = shape{"[(", ")]"}
-	MermaidShapeCirle            = shape{"((", "))"} // Deprecated: use MermaidShapeCircle instead
+	MermaidShapeRound      = shape{"(", ")"}
+	MermaidShapeStadium    = shape{"([", "])"}
+	MermaidShapeSubroutine = shape{"[[", "]]"}
+	MermaidShapeCylinder   = shape{"[(", ")]"}
+	//Deprecated: use MermaidShapeCircle instead
+	MermaidShapeCirle            = shape{"((", "))"}
 	MermaidShapeCircle           = shape{"((", "))"}
 	MermaidShapeAsymmetric       = shape{">", "]"}
 	MermaidShapeRhombus          = shape{"{", "}"}
@@ -114,6 +115,7 @@ func diagramGraph(g *Graph, sb *strings.Builder) {
 	if g.graphType == "graph" {
 		denoteEdge = "---"
 	}
+	edgeCount := 0
 	for _, each := range g.sortedEdgesFromKeys() {
 		all := g.edgesFrom[each]
 		for _, each := range all {
@@ -126,6 +128,7 @@ func diagramGraph(g *Graph, sb *strings.Builder) {
 					link = slink
 				}
 			}
+			escapedLabel := ""
 			if label := each.GetAttr("label"); label != nil {
 				slabel, ok := label.(string)
 				if !ok {
@@ -133,14 +136,30 @@ func diagramGraph(g *Graph, sb *strings.Builder) {
 					slabel = fmt.Sprintf("%v", label)
 				}
 				if label != "" {
-					fmt.Fprintf(sb, "\tn%d%s|%s|n%d;\n", each.from.seq, link, escape(slabel), each.to.seq)
-					continue
+					escapedLabel = fmt.Sprintf("|%s|", escape(slabel))
 				}
 			}
-			// no label
-			fmt.Fprintf(sb, "\tn%d%sn%d;\n", each.from.seq, link, each.to.seq)
+			id := ""
+			if edgeNeedsID(each) {
+				id = fmt.Sprintf("e%d@", edgeCount)
+			}
+			fmt.Fprintf(sb, "\tn%d %s%s%s n%d;\n", each.from.seq, id, link, escapedLabel, each.to.seq)
+			// check for linkStyle
+			if style := each.GetAttr("linkStyle"); style != nil {
+				fmt.Fprintf(sb, "\tlinkStyle %d %s\n", edgeCount, style.(string))
+			}
+			// check for animate
+			if animate := each.GetAttr("animate"); animate != nil {
+				fmt.Fprintf(sb, "\te%d@{animate: %s}\n", edgeCount, animate.(string))
+			}
+			edgeCount++
 		}
 	}
+}
+
+func edgeNeedsID(e Edge) bool {
+	// TODO more conditions?
+	return e.GetAttr("animate") != nil
 }
 
 func writeEnd(sb *strings.Builder) {

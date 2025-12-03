@@ -10,7 +10,7 @@ func TestMermaidSimple(t *testing.T) {
 	n2 := di.Node("e2").Attr("shape", MermaidShapeRound).Attr("style", "fill:#90EE90")
 	n1.Edge(n2, "what").Attr("x", "y")
 	out := flatten(MermaidGraph(di, MermaidTopDown))
-	if got, want := out, `graph TD;n1("E1");n2("e2");style n2 fill:#90EE90n1-->|"what"|n2;`; got != want {
+	if got, want := out, `graph TD;n1("E1");n2("e2");style n2 fill:#90EE90n1 -->|"what"| n2;`; got != want {
 		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
 	}
 }
@@ -75,7 +75,7 @@ func TestUndirectedMermaid(t *testing.T) {
 	un.Node("love").Edge(un.Node("happinez"))
 	s := MermaidFlowchart(un, MermaidLeftToRight)
 	//t.Log(s)
-	if got, want := flatten(s), `flowchart LR;n2("happinez");n1("love");n1---n2;`; got != want {
+	if got, want := flatten(s), `flowchart LR;n2("happinez");n1("love");n1 --- n2;`; got != want {
 		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
 	}
 }
@@ -85,7 +85,7 @@ func TestNonStringLinkEdge(t *testing.T) {
 	un.Node("love").Edge(un.Node("happinez")).Attr("link", "---")
 	s := MermaidFlowchart(un, MermaidLeftToRight)
 	//t.Log(s)
-	if got, want := flatten(s), `flowchart LR;n2("happinez");n1("love");n1---n2;`; got != want {
+	if got, want := flatten(s), `flowchart LR;n2("happinez");n1("love");n1 --- n2;`; got != want {
 		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
 	}
 }
@@ -95,7 +95,7 @@ func TestNonStringLabelEdge(t *testing.T) {
 	un.Node("love").Edge(un.Node("happinez")).Attr("label", true)
 	s := MermaidFlowchart(un, MermaidLeftToRight)
 	//t.Log(s)
-	if got, want := flatten(s), `flowchart LR;n2("happinez");n1("love");n1---|"true"|n2;`; got != want {
+	if got, want := flatten(s), `flowchart LR;n2("happinez");n1("love");n1 ---|"true"| n2;`; got != want {
 		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
 	}
 }
@@ -113,7 +113,7 @@ func TestMermaidSubgraph(t *testing.T) {
 
 	sub3.Node("c1").Edge(sub1.Node("a2"))
 	mf := MermaidFlowchart(di, MermaidLeftToRight)
-	if got, want := flatten(mf), `flowchart LR;n8-->n3;subgraph THREE [three];n8("c1");n9("c2");n8-->n9;end;subgraph one [one];n2("a1");n3("a2");n2-->n3;end;subgraph two [two];n5("b1");n6("b2");n5-->n6;end;`; got != want {
+	if got, want := flatten(mf), `flowchart LR;n8 --> n3;subgraph THREE [three];n8("c1");n9("c2");n8 --> n9;end;subgraph one [one];n2("a1");n3("a2");n2 --> n3;end;subgraph two [two];n5("b1");n6("b2");n5 --> n6;end;`; got != want {
 		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 	}
 }
@@ -123,7 +123,7 @@ func TestMermaidFromBoxShape(t *testing.T) {
 	graph.Node("A").Box()
 	graph.Edge(graph.Node("A"), graph.Node("B"))
 
-	if got, want := flatten(MermaidGraph(graph, MermaidTopDown)), `graph TD;n1("A");n2("B");n1-->n2;`; got != want {
+	if got, want := flatten(MermaidGraph(graph, MermaidTopDown)), `graph TD;n1("A");n2("B");n1 --> n2;`; got != want {
 		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 	}
 }
@@ -157,5 +157,17 @@ func TestLookupShape(t *testing.T) {
 				t.Errorf("lookupShape(%q) = (%v, %v), want (%v, %v)", tt.shapeName, gotShape, gotOk, tt.wantShape, tt.wantOk)
 			}
 		})
+	}
+}
+
+func TestMermaidAnimatedLinkStyleEdge(t *testing.T) {
+	graph := NewGraph(Directed)
+	graph.Node("A").Box()
+	graph.Edge(graph.Node("A"), graph.Node("B")).Apply(func(e Edge) {
+		e.Attr("linkStyle", "stroke:red").Attr("animate", "true")
+	})
+
+	if got, want := flatten(MermaidGraph(graph, MermaidTopDown)), `graph TD;n1("A");n2("B");n1 e0@--> n2;linkStyle 0 stroke:rede0@{animate: true}`; got != want {
+		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 	}
 }

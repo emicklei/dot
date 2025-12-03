@@ -52,3 +52,13 @@ func TestNodesWithBidirectionalEdge(t *testing.T) {
 		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
 	}
 }
+
+func TestNodeApply(t *testing.T) {
+	g := NewGraph(Directed)
+	a := g.Node("A").Apply(func(n Node) {
+		n.Attr("color", "red")
+	})
+	if got, want := a.Value("color"), "red"; got != want {
+		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
+	}
+}
