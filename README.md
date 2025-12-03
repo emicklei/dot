@@ -132,6 +132,8 @@ flowchart LR;n8-->n3;subgraph one;n2("a1");n3("a2");n2-->n3;end;subgraph three;n
 |link|Edge|examples are {-->,-.->,--x,o--o}|
 |shape|Node|examples are {MermaidShapeRound,MermaidShapeCircle,MermaidShapeTrapezoid}
 |style|Node|example is fill:#90EE90|
+|animate|Edge| Attr("animate","true)|
+|linkStyle|Edge| Attr("linkStyle","stroke:red")|
 
 ## extensions
 
