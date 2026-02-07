@@ -1,5 +1,9 @@
 # Change history of the dot package
 
+## v1.11.0 - 2026-02-07
+
+- add Graph.HasNodeWithID(id string) bool
+
 ## v1.10.0 - 2025-12-03
 
 - add Node.Apply

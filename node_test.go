@@ -20,8 +20,15 @@ func TestNode_Label(t *testing.T) {
 		t.Fail()
 	}
 	n.Label("42")
+	if n.HasDefaultLabel() {
+		t.Error("expected to not have default label")
+	}
 	if n.Value("label") != "42" {
 		t.Fail()
+	}
+	n.Delete("label")
+	if n.HasDefaultLabel() {
+		t.Error("expected to not have default label when label attribute is missing")
 	}
 }
 

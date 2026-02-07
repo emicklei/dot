@@ -114,6 +114,17 @@ func TestTwoConnectedNodes(t *testing.T) {
 	}
 }
 
+func TestHasNodeWithID(t *testing.T) {
+	g := NewGraph(Directed)
+	g.Node("A")
+	if !g.HasNodeWithID("A") {
+		t.Error("expected to have node with id A")
+	}
+	if g.HasNodeWithID("B") {
+		t.Error("not expected to have node with id B")
+	}
+}
+
 func TestGraph_FindEdges(t *testing.T) {
 	di := NewGraph(Directed)
 	n1 := di.Node("A")

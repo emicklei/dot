@@ -434,6 +434,12 @@ func (g *Graph) HasNode(n Node) bool {
 	return g == n.graph
 }
 
+// HasNodeWithID returns whether a node with the given id exists in this graph or any of its parent graphs.
+func (g *Graph) HasNodeWithID(id string) bool {
+	_, ok := g.findNode(id)
+	return ok
+}
+
 // GetAttributes returns a copy of the attributes.
 func (am *AttributesMap) GetAttributes() map[string]interface{} {
 	copyMap := make(map[string]interface{}, len(am.attributes))
