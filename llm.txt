@@ -1,0 +1,210 @@
+# dot - Go package for constructing Graphviz DOT graphs
+
+Import path: `github.com/emicklei/dot`
+License: MIT
+Purpose: Programmatically build Graphviz DOT source (and optionally Mermaid) via a fluent API. Produces DOT text; does not invoke Graphviz.
+
+This document is a compact reference for LLM agents writing Go code with this package.
+
+---
+
+## 1. Getting started
+
+```go
+import "github.com/emicklei/dot"
+
+g := dot.NewGraph(dot.Directed)           // or dot.Undirected, dot.Strict (combinable)
+n1 := g.Node("coding")
+n2 := g.Node("testing a little").Box()     // shape=box
+g.Edge(n1, n2)
+g.Edge(n2, n1, "back").Attr("color", "red")
+fmt.Println(g.String())                    // serializes to DOT
+```
+
+`Node` and `Edge` are VALUE types. Methods that set attributes return the value so chaining works, but storing a variable captures a snapshot of the wrapper — the underlying attribute map is shared, so subsequent `Attr(...)` calls on any copy still mutate the same node/edge. Re-fetch via `g.Node(id)` anytime; creation is idempotent by id.
+
+## 2. Types & constructors
+
+### Graph
+- `dot.NewGraph(options ...GraphOption) *Graph`
+- Graph options (pass any combination): `dot.Directed`, `dot.Undirected`, `dot.Strict`, `dot.Sub` (subgraph), `dot.ClusterOption{}` (mark subgraph as cluster; prefixes id with `cluster_`).
+- `g.ID("name") *Graph` — set once; panics if overwritten.
+- `g.Label(s) *Graph` — shortcut for `Attr("label", s)`.
+- `g.Attr(key, value)` / `g.Attrs(k,v, k,v, ...)` — graph-level attributes.
+
+### Node
+- `g.Node(id string) Node` — create or fetch; sets `label=id` by default.
+- Methods: `ID()`, `Label(s)`, `Box()`, `Attr(k,v)`, `GetAttr(k)`, `GetAttributes()`, `HasDefaultLabel()`, `Apply(func(Node))`.
+- Edge helpers: `Edge(to, labels...)`, `ReverseEdge(from, labels...)`, `BidirectionalEdge(other)` (returns `[]Edge`; renders as an invisible forward + reverse with `dir=both`), `EdgesTo(to)`.
+- Records: `NewRecordBuilder()` — see §6.
+
+### Edge
+- `g.Edge(from, to, labels...) Edge`
+- `g.EdgeWithPorts(from, to, fromPort, toPort, labels...) Edge`
+- Labels variadic are joined by "," into the `label` attribute.
+- Methods: `Attr(k,v)`, `Label(v)`, `Solid()`, `Bold()`, `Dashed()`, `Dotted()`, `From()`, `To()`, `GetAttr(k)`, `GetAttributes()`, `Apply(func(Edge))`.
+- Chain edges: `e.Edge(next)` creates a new edge from `e.To()` to `next`. So `g.Node("A").Edge(g.Node("B")).Edge(g.Node("C"))` produces `A -> B -> C`.
+- `e.ReverseEdge(from)` creates from `from` to `e.To()`.
+- Cross-subgraph edges are stored on the common (root) parent graph automatically.
+
+### Attributes
+- `AttributesMap` is embedded in Graph/Node/Edge. Prefer the wrapper methods above.
+- `Attr(label, value)`: empty strings and nil are ignored.
+- `Attrs(k1, v1, k2, v2, ...)`: panics on odd count.
+- `Delete(key)`, `Value(key)`.
+- Special value types:
+  - `dot.HTML("<B>hi</B>")` — emitted as `=<…>` (Graphviz HTML-like label).
+  - `dot.Literal(`"\l"`)` — emitted verbatim (no quoting/escaping). Caller must supply quotes/escapes.
+  - String values are quoted with `%q`; other types via `%v` quoted.
+
+## 3. Subgraphs & clusters
+
+```go
+sub := g.Subgraph("child id", dot.ClusterOption{})   // ClusterOption makes it a cluster_ prefixed cluster
+sub.Attr("style", "filled")
+inside := sub.Node("inner")
+g.Node("outside").Edge(inside)    // edge lives on the common parent
+```
+
+- `Subgraph(id, ...)` is idempotent by id; sets `label=id` initially.
+- `FindSubgraph(id)` walks up parents.
+- `Root()` returns the top-level graph.
+- `AddToSameRank(group string, nodes ...Node)` emits `{rank=same; ...}`.
+
+## 4. Initializers (defaults applied at creation time)
+
+```go
+g.NodeInitializer(func(n dot.Node) {
+    n.Attr("shape", "rectangle")
+    n.Attr("fontname", "arial")
+})
+g.EdgeInitializer(func(e dot.Edge) {
+    e.Attr("arrowhead", "open")
+})
+```
+
+Initializers propagate to subgraphs created after they are set.
+
+## 5. Output
+
+- `g.String() string` — DOT source.
+- `g.Write(io.Writer)` / `g.IndentedWrite(*IndentWriter)`.
+- Attributes and nodes/edges/subgraphs are written in sorted key order for stable output.
+- Internal node ids are synthesized as `n<seq>`; user ids are used only for lookup.
+
+## 6. Record-shaped nodes
+
+```go
+rb := g.Node("struct1").NewRecordBuilder()
+rb.FieldWithId("left", "f0")
+rb.FieldWithId("mid", "f1")
+rb.Nesting(func() {            // produces {...} nested block
+    rb.Field("a")
+    rb.Field("b")
+})
+rb.Build()                     // sets shape=record and label
+// Use .MRecord() before Build() for shape=mrecord
+// Connect to ports with:
+g.EdgeWithPorts(g.Node("struct1"), g.Node("struct2"), "f1", "f0")
+```
+
+## 7. Traversal & queries
+
+- `g.VisitNodes(cb func(Node) (done bool))` — recursive; return true to stop.
+- `g.WalkEdges(cb func(Edge) bool)` — recursive; return false to stop.
+- `g.FindNodeById(id) (Node, bool)` — recursive across subgraphs.
+- `g.FindNodes() []Node` — all nodes recursively.
+- `g.FindNodeWithLabel(label) (Node, bool)` — searches current + parents (not subgraphs).
+- `g.FindEdges(from, to) []Edge`.
+- `g.HasNode(n)` — true only if `n` was created in `g` directly.
+- `g.HasNodeWithID(id)` — checks current graph and ancestors.
+- `g.EdgesMap() map[string][]Edge` — keyed by source node id.
+- `g.IsDirected() bool`.
+- `g.DeleteNode(id) bool` — removes node and incident edges from this graph.
+- `g.DeepCopy() *Graph` — full recursive copy (attributes, nodes, edges, subgraphs, sameRank, initializers).
+
+## 8. Mermaid output
+
+```go
+fmt.Println(dot.MermaidGraph(g, dot.MermaidTopToBottom))
+fmt.Println(dot.MermaidFlowchart(g, dot.MermaidLeftToRight))
+```
+
+Orientations: `MermaidTopToBottom` / `MermaidTopDown`, `MermaidBottomToTop`, `MermaidRightToLeft`, `MermaidLeftToRight`.
+
+Node shapes (use as the value of the `shape` attribute, either via the shape var or its string alias):
+`MermaidShapeRound` ("round"/"box"), `MermaidShapeStadium` ("stadium"), `MermaidShapeSubroutine` ("subroutine"), `MermaidShapeCylinder` ("cylinder"), `MermaidShapeCircle` ("circle"), `MermaidShapeAsymmetric` ("asymmetric"), `MermaidShapeRhombus` ("rhombux"), `MermaidShapeTrapezoid` ("trapezoid"), `MermaidShapeTrapezoidAlt` ("trapezoid-alt"), `MermaidShapeHexagon` ("hexagon"), `MermaidShapeParallelogram` ("parallelogram"), `MermaidShapeParallelogramAlt` ("parallelogram-alt"). (`MermaidShapeCirle` is a deprecated alias.)
+
+Mermaid-specific attributes on Edge/Node:
+- Edge `link` — override connector, e.g. `-->`, `-.->`, `--x`, `o--o`.
+- Edge `linkStyle` — e.g. `"stroke:red"`.
+- Edge `animate` — e.g. `"true"` (adds per-edge id and animate block).
+- Node `style` — passed through as `style nX <value>`.
+
+Only `Directed` (`-->`) and `Undirected` (`---`) default connectors are supported; subgraphs are emitted as `subgraph id [label]; ... end;`.
+
+## 9. dotx subpackage — `github.com/emicklei/dot/dotx`
+
+Higher-level `Composite` for building composition hierarchies.
+
+```go
+import "github.com/emicklei/dot/dotx"
+
+parent := dot.NewGraph(dot.Directed)
+sub := dotx.NewComposite("Subsystem", parent, dotx.SameGraph)       // or dotx.ExternalGraph
+// sub embeds *dot.Graph so: sub.Node, sub.Edge, sub.Subgraph work on the inner graph.
+inner := sub.Node("inner component")
+sub.Input("in", parent.Node("source"))      // edge on outer graph into the composite
+sub.Output("out", parent.Node("sink"))      // edge on outer graph out of the composite
+
+// ExternalGraph variant: inner graph is exported to its own .dot file
+ext := dotx.NewComposite("Service", parent, dotx.ExternalGraph).
+    Export(func(g *dot.Graph) { g.Node("x") })    // writes Service.dot and sets SVG href
+ext.ExportName("custom_name")   // change exported filename / href before Export
+```
+
+`Connectable` interface (input/output endpoints) is satisfied by `dot.Node` and `*dotx.Composite`.
+`Input`/`Output` auto-select inner vs outer graph based on where the peer node lives, and render internal ports as `shape=point` with `taillabel`/`headlabel`.
+
+## 10. Idioms & gotchas
+
+- Always pass `dot.Directed` (or `Undirected`) to `NewGraph`; the default graphType is set via options.
+- Creating the same node/subgraph id twice returns the existing instance; attributes persist.
+- Setting an empty string value via `Attr` is a no-op (does not clear). Use `Delete(key)` to remove.
+- `BidirectionalEdge` returns two edges; the forward one is marked `style=invis`.
+- Use `Literal` only when you need to embed raw DOT syntax inside an attribute (e.g. `\l`, `\n`, or pre-quoted text). Use `HTML` for `<…>` labels.
+- Output is deterministic: keys/ids/subgraphs are sorted before writing.
+- Node sequence numbers (`n1`, `n2`, …) come from the root graph counter; they are stable per process but depend on creation order.
+- Edges between nodes in different subgraphs are stored on the common parent (currently `Root()`), so they render at the top level.
+
+## 11. Full example (cluster + record + styling)
+
+```go
+g := dot.NewGraph(dot.Directed)
+g.NodeInitializer(func(n dot.Node) { n.Attr("fontname", "arial") })
+
+outside := g.Node("Outside")
+
+a := g.Subgraph("Cluster A", dot.ClusterOption{})
+a.Attr("style", "filled")
+one := a.Node("one")
+two := a.Node("two")
+
+b := g.Subgraph("Cluster B", dot.ClusterOption{})
+three := b.Node("three")
+
+outside.Edge(two).Edge(one).Edge(three).Edge(outside).Attr("color", "red")
+
+rb := g.Node("rec").NewRecordBuilder()
+rb.FieldWithId("head", "h").Field("body").Build()
+g.EdgeWithPorts(g.Node("rec"), one, "h", "")
+
+fmt.Println(g.String())
+```
+
+## 12. Rendering (outside the package)
+
+Produce DOT text with this package, then pipe to Graphviz:
+```
+go run main.go | dot -Tpng > out.png
+```
