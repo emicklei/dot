@@ -133,7 +133,7 @@ fmt.Println(dot.MermaidFlowchart(g, dot.MermaidLeftToRight))
 Orientations: `MermaidTopToBottom` / `MermaidTopDown`, `MermaidBottomToTop`, `MermaidRightToLeft`, `MermaidLeftToRight`.
 
 Node shapes (use as the value of the `shape` attribute, either via the shape var or its string alias):
-`MermaidShapeRound` ("round"/"box"), `MermaidShapeStadium` ("stadium"), `MermaidShapeSubroutine` ("subroutine"), `MermaidShapeCylinder` ("cylinder"), `MermaidShapeCircle` ("circle"), `MermaidShapeAsymmetric` ("asymmetric"), `MermaidShapeRhombus` ("rhombux"), `MermaidShapeTrapezoid` ("trapezoid"), `MermaidShapeTrapezoidAlt` ("trapezoid-alt"), `MermaidShapeHexagon` ("hexagon"), `MermaidShapeParallelogram` ("parallelogram"), `MermaidShapeParallelogramAlt` ("parallelogram-alt"). (`MermaidShapeCirle` is a deprecated alias.)
+`MermaidShapeRound` ("round"/"box"), `MermaidShapeStadium` ("stadium"), `MermaidShapeSubroutine` ("subroutine"), `MermaidShapeCylinder` ("cylinder"), `MermaidShapeCircle` ("circle"), `MermaidShapeAsymmetric` ("asymmetric"), `MermaidShapeRhombus` ("rhombux"), `MermaidShapeTrapezoid` ("trapezoid"), `MermaidShapeTrapezoidAlt` ("trapezoid-alt"), `MermaidShapeHexagon` ("hexagon"), `MermaidShapeParallelogram` ("parallelogram"), `MermaidShapeParallelogramAlt` ("parallelogram-alt").
 
 Mermaid-specific attributes on Edge/Node:
 - Edge `link` — override connector, e.g. `-->`, `-.->`, `--x`, `o--o`.
